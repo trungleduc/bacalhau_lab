@@ -17,8 +17,7 @@ import { ReadonlyPartialJSONObject } from '@lumino/coreutils';
 import { IDisposable } from '@lumino/disposable';
 
 import { DeAISwitcher } from './widget';
-
-// import { bhlIcon } from '../utils';
+import { IDeAIProtocol } from '../token';
 
 /**
  * The command IDs used by the plugin.
@@ -27,42 +26,39 @@ export namespace CommandIDs {
   export const bhlOpen = 'notebook:open-with-bhl';
 }
 
-/**
- * A notebook widget extension that adds a voila preview button to the toolbar.
- */
 class DeAIButton
   implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel>
 {
-  /**
-   * Instantiate a new VoilaRenderButton.
-   * @param commands The command registry.
-   */
-  constructor(commands: CommandRegistry) {
+  constructor(allProtocols: IDeAIProtocol, commands: CommandRegistry) {
     this._commands = commands;
+    this._allProtocols = allProtocols;
   }
 
-  /**
-   * Create a new extension object.
-   */
   createNew(panel: NotebookPanel): IDisposable {
-    const button = new DeAISwitcher(this._commands);
+    const button = new DeAISwitcher(this._allProtocols, this._commands);
     panel.toolbar.insertAfter('cellType', 'bhlLab', button);
     return button;
   }
 
   private _commands: CommandRegistry;
+  private _allProtocols: IDeAIProtocol;
 }
 
 export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
   id: 'bacalhau_lab:toolbar-plugin',
   autoStart: true,
+  requires: [IDeAIProtocol],
   optional: [
     INotebookTracker,
     ICommandPalette,
     ILayoutRestorer,
     ISettingRegistry
   ],
-  activate: (app: JupyterFrontEnd, notebooks: INotebookTracker | null) => {
+  activate: (
+    app: JupyterFrontEnd,
+    allProtocols: IDeAIProtocol,
+    notebooks: INotebookTracker | null
+  ) => {
     function getCurrent(args: ReadonlyPartialJSONObject): NotebookPanel | null {
       const widget = notebooks?.currentWidget ?? null;
       const activate = args['activate'] !== false;
@@ -80,7 +76,6 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
         notebooks?.currentWidget === app.shell.currentWidget
       );
     }
-
     const { commands, docRegistry } = app;
 
     commands.addCommand(CommandIDs.bhlOpen, {
@@ -129,7 +124,7 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
       isEnabled
     });
 
-    const bhlButton = new DeAIButton(commands);
+    const bhlButton = new DeAIButton(allProtocols, commands);
     docRegistry.addWidgetExtension('Notebook', bhlButton);
   }
 };

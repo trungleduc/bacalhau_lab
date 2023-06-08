@@ -146,4 +146,3 @@ jobs:
         path: |
           ui-tests/test-results
           ui-tests/playwright-report
-

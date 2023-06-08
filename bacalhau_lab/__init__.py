@@ -1,18 +1,12 @@
-from ._version import __version__
 from .handlers import setup_handlers
 
 
 def _jupyter_labextension_paths():
-    return [{
-        "src": "labextension",
-        "dest": "bacalhau_lab"
-    }]
+    return [{"src": "labextension", "dest": "bacalhau_lab"}]
 
 
 def _jupyter_server_extension_points():
-    return [{
-        "module": "bacalhau_lab"
-    }]
+    return [{"module": "bacalhau_lab"}]
 
 
 def _load_jupyter_server_extension(server_app):

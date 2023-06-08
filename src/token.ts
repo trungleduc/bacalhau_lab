@@ -12,3 +12,15 @@ export const IBhlViewerTracker = new Token<IBhlViewerTracker>(
 export type IBhlViewerTracker = IWidgetTracker<BhlDocWidget>;
 
 export type IBhlDocWidget = IDocumentWidget<Widget>;
+
+export interface IDict<T = any> {
+  [key: string]: T;
+}
+export interface IDeAIProtocol {
+  availableProtocol: IDict<{ icon?: string }>;
+}
+
+export const IDeAIProtocol = new Token<IDeAIProtocol>(
+  'bhl:IDeAIProtocol',
+  'Available protocol data'
+);

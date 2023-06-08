@@ -1,6 +1,7 @@
 import { HTMLSelect, ReactWidget } from '@jupyterlab/ui-components';
 import * as React from 'react';
 import { CommandRegistry } from '@lumino/commands';
+import { IDeAIProtocol } from '../token';
 
 const TOOLBAR_CELLTYPE_CLASS = 'jp-Notebook-toolbarCellType';
 
@@ -10,9 +11,10 @@ export class DeAISwitcher extends ReactWidget {
   /**
    * Construct a new cell type switcher.
    */
-  constructor(commands: CommandRegistry) {
+  constructor(allProtocols: IDeAIProtocol, commands: CommandRegistry) {
     super();
     this._commands = commands;
+    this._allProtocols = allProtocols;
     this.addClass(TOOLBAR_CELLTYPE_CLASS);
   }
 
@@ -20,21 +22,9 @@ export class DeAISwitcher extends ReactWidget {
    * Handle `change` events for the HTMLSelect component.
    */
   handleChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
-    console.log('event', event.target.value);
-    switch (event.target.value) {
-      case 'Bacalhau':
-        this._commands.execute('notebook:open-with-bhl', {
-          protocol: event.target.value
-        });
-        break;
-      case 'Error':
-        this._commands.execute('notebook:open-with-bhl', {
-          protocol: event.target.value
-        });
-        break;
-      default:
-        break;
-    }
+    this._commands.execute('notebook:open-with-bhl', {
+      protocol: event.target.value
+    });
     this.update();
   };
 
@@ -56,11 +46,19 @@ export class DeAISwitcher extends ReactWidget {
         value={'DeAI'}
       >
         <option value="DeAI">DeAI Protocol</option>
-        <option value="Bacalhau">BACALHAU</option>
-        <option value="Error">ERROR</option>
+        {Object.entries(this._allProtocols.availableProtocol).map(
+          ([key, value]) => {
+            return (
+              <option value={key} key={key}>
+                {key.toUpperCase()}
+              </option>
+            );
+          }
+        )}
       </HTMLSelect>
     );
   }
 
   private _commands: CommandRegistry;
+  private _allProtocols: IDeAIProtocol;
 }

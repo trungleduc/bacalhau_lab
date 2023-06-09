@@ -1,9 +1,10 @@
-import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 import { ABCWidgetFactory, DocumentRegistry } from '@jupyterlab/docregistry';
+import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 import { CommandRegistry } from '@lumino/commands';
-import { BhlDocWidget } from './bhlDocWidget';
-import { Widget } from '@lumino/widgets';
+
 import { bhlIcon } from '../utils';
+import { DeAIPanel } from './bhlDocPanel';
+import { BhlDocWidget } from './bhlDocWidget';
 
 export class BhlDocWidgetFactory extends ABCWidgetFactory<BhlDocWidget> {
   constructor(options: BhlDocWidgetFactory.IOptions) {
@@ -21,10 +22,8 @@ export class BhlDocWidgetFactory extends ABCWidgetFactory<BhlDocWidget> {
    * @returns The widget
    */
   protected createNewWidget(context: DocumentRegistry.Context): BhlDocWidget {
-    const content = new Widget();
-    context.ready.then(() => {
-      content.node.innerHTML = context.model.toString();
-    });
+    const content = new DeAIPanel({ context });
+
     const widget = new BhlDocWidget({ context, content });
     widget.title.icon = bhlIcon;
     return widget;

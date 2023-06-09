@@ -45,7 +45,7 @@ export class DeAISwitcher extends ReactWidget {
         title={'DeAI Protocol'}
         value={'DeAI'}
       >
-        <option value="DeAI">DeAI Protocol</option>
+        <option value="DeAI">Run in...</option>
         {Object.entries(this._allProtocols.availableProtocol).map(
           ([key, value]) => {
             return (

@@ -10,6 +10,8 @@
 .jp-deai-control-panel {
   background: var(--jp-layout-color2);
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .split-view-view:not(:first-child)::before {
   width: 2px !important;

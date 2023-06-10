@@ -1,5 +1,8 @@
-import { Box, Container } from '@mui/material';
+import { Download, PlayCircle, Save } from '@mui/icons-material';
+import { Box, Card, Container } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
+import BottomNavigation from '@mui/material/BottomNavigation';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 
@@ -17,13 +20,26 @@ export function ControlPanel() {
           DeAI Request
         </Typography>
       </AppBar>
-      <Container maxWidth="md">
+      <Container maxWidth="md" sx={{ flexGrow: 1, overflow: 'auto' }}>
         <StyledAccordion
           title="GENERAL SETTINGS"
           panel={
             <p>
               Nulla facilisi. Phasellus sollicitudin nulla et quam mattis
-              feugiat. Aliquam eget maximus est, id dignissim quam.
+              feugiat. Aliquam eget maximus est, id dignissim quam. Nulla
+              facilisi. Phasellus sollicitudin nulla et quam mattis feugiat.
+              Aliquam eget maximus est, id dignissim quam. Nulla facilisi.
+              Phasellus sollicitudin nulla et quam mattis feugiat. Aliquam eget
+              maximus est, id dignissim quam. Nulla facilisi. Phasellus
+              sollicitudin nulla et quam mattis feugiat. Aliquam eget maximus
+              est, id dignissim quam. Nulla facilisi. Phasellus sollicitudin
+              nulla et quam mattis feugiat. Aliquam eget maximus est, id
+              dignissim quam. Nulla facilisi. Phasellus sollicitudin nulla et
+              quam mattis feugiat. Aliquam eget maximus est, id dignissim quam.
+              Nulla facilisi. Phasellus sollicitudin nulla et quam mattis
+              feugiat. Aliquam eget maximus est, id dignissim quam. Nulla
+              facilisi. Phasellus sollicitudin nulla et quam mattis feugiat.
+              Aliquam eget maximus est, id dignissim quam.
             </p>
           }
           defaultExpanded={true}
@@ -49,6 +65,25 @@ export function ControlPanel() {
           defaultExpanded={true}
         />
       </Container>
+      <Card elevation={5}>
+        <BottomNavigation showLabels>
+          <BottomNavigationAction
+            label="SAVE"
+            icon={<Save color="warning" />}
+          />
+          <BottomNavigationAction
+            color="primary"
+            label="RUN"
+            icon={<PlayCircle color="primary" />}
+          />
+          <BottomNavigationAction
+            color="disabled"
+            disabled
+            label="GET RESULT"
+            icon={<Download color="disabled" />}
+          />
+        </BottomNavigation>
+      </Card>
     </Box>
   );
 }

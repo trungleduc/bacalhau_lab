@@ -1,3 +1,3 @@
 export interface IDeAIState {
-  protocol: string;
+  protocol?: string;
 }

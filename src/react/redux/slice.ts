@@ -1,8 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { IDeAIState } from './types';
 
 export const INITIAL_STATE: IDeAIState = {
-  protocol: 'foobar'
+  protocol: undefined
 };
 
 export const slice = createSlice({
@@ -11,7 +11,8 @@ export const slice = createSlice({
   reducers: {
     reset: state => {
       return INITIAL_STATE;
-    }
+    },
+    load: (state, action: PayloadAction<IDeAIState>) => ({ ...action.payload })
   }
 });
 

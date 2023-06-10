@@ -1,23 +1,26 @@
-import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 import {
   JupyterFrontEnd,
-  JupyterFrontEndPlugin,
-  ILayoutRestorer
+  JupyterFrontEndPlugin
 } from '@jupyterlab/application';
-import { WidgetTracker } from '@jupyterlab/apputils';
+import { IThemeManager, WidgetTracker } from '@jupyterlab/apputils';
+import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 
 import { IBhlViewerTracker } from '../token';
+import { bhlIcon } from '../utils';
 import { BhlDocWidget } from './bhlDocWidget';
 import { BhlDocWidgetFactory } from './widgetFactory';
-import { bhlIcon } from '../utils';
 
 export const bhlPlugin: JupyterFrontEndPlugin<IBhlViewerTracker> = {
   id: 'bhl-lab:document-plugin',
   autoStart: true,
   provides: IBhlViewerTracker,
   requires: [IRenderMimeRegistry],
-  optional: [ILayoutRestorer],
-  activate: (app: JupyterFrontEnd, rendermime: IRenderMimeRegistry) => {
+  optional: [IThemeManager],
+  activate: (
+    app: JupyterFrontEnd,
+    rendermime: IRenderMimeRegistry,
+    themeManager: IThemeManager
+  ) => {
     const tracker = new WidgetTracker<BhlDocWidget>({
       namespace: 'bhl-lab:widgets'
     });
@@ -26,7 +29,8 @@ export const bhlPlugin: JupyterFrontEndPlugin<IBhlViewerTracker> = {
       fileTypes: ['bhl'],
       defaultFor: ['bhl'],
       rendermime,
-      commands: app.commands
+      commands: app.commands,
+      themeManager
     });
     widgetFactory.widgetCreated.connect((_, widget) => {
       widget.context.pathChanged.connect(() => {

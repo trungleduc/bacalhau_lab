@@ -3,3 +3,14 @@
 
     https://jupyterlab.readthedocs.io/en/stable/developer/css.html
 */
+
+.jp-deai-main {
+  height: 100%;
+}
+.jp-deai-control-panel {
+  background: var(--jp-layout-color2);
+  height: 100%;
+}
+.split-view-view:not(:first-child)::before {
+  width: 2px !important;
+}

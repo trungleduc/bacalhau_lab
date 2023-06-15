@@ -1,0 +1,7 @@
+{
+  "protocol": "bacalhau",
+  "availableImage": [
+    "tensorflow/tensorflow:latest",
+    "tensorflow/tensorflow:latest-gpu"
+  ]
+}

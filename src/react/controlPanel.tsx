@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import * as React from 'react';
 
 import StyledAccordion from './components/styledAccordion';
+import { GeneralSetting } from './components/generalSetting';
 
 export function ControlPanel() {
   return (
@@ -23,25 +24,7 @@ export function ControlPanel() {
       <Container maxWidth="md" sx={{ flexGrow: 1, overflow: 'auto' }}>
         <StyledAccordion
           title="GENERAL SETTINGS"
-          panel={
-            <p>
-              Nulla facilisi. Phasellus sollicitudin nulla et quam mattis
-              feugiat. Aliquam eget maximus est, id dignissim quam. Nulla
-              facilisi. Phasellus sollicitudin nulla et quam mattis feugiat.
-              Aliquam eget maximus est, id dignissim quam. Nulla facilisi.
-              Phasellus sollicitudin nulla et quam mattis feugiat. Aliquam eget
-              maximus est, id dignissim quam. Nulla facilisi. Phasellus
-              sollicitudin nulla et quam mattis feugiat. Aliquam eget maximus
-              est, id dignissim quam. Nulla facilisi. Phasellus sollicitudin
-              nulla et quam mattis feugiat. Aliquam eget maximus est, id
-              dignissim quam. Nulla facilisi. Phasellus sollicitudin nulla et
-              quam mattis feugiat. Aliquam eget maximus est, id dignissim quam.
-              Nulla facilisi. Phasellus sollicitudin nulla et quam mattis
-              feugiat. Aliquam eget maximus est, id dignissim quam. Nulla
-              facilisi. Phasellus sollicitudin nulla et quam mattis feugiat.
-              Aliquam eget maximus est, id dignissim quam.
-            </p>
-          }
+          panel={<GeneralSetting />}
           defaultExpanded={true}
         />
         <StyledAccordion

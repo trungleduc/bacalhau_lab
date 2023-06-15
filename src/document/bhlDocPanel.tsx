@@ -19,6 +19,8 @@ export class DeAIPanel extends ReactWidget {
     this.addClass('jp-deai-panel');
     this.options.context.ready.then(() => {
       const state = this.options.context.model.toJSON() as any;
+      console.log('stawe', state);
+
       store.dispatch(reduxAction.load(state));
     });
   }

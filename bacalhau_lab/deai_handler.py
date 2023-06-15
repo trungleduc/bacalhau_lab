@@ -19,12 +19,15 @@ def init_data():
         _type_: _description_
     """
 
-    data = {}
+    data = {"availableProtocol": {}, "availableImage": []}
     for Protocol in AVAILABLE_PROTOCOLS:
         protocol: DeProtocol = Protocol()
         name = protocol.get_name()
-        data[name] = dict(
+        data["availableProtocol"][name] = dict(
             icon=content_from_path(protocol.get_icon()),
         )
-
+    data["availableImage"] = [
+        "tensorflow/tensorflow:latest",
+        "tensorflow/tensorflow:latest-gpu",
+    ]
     return data

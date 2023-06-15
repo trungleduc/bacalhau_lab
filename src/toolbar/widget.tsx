@@ -11,10 +11,10 @@ export class DeAISwitcher extends ReactWidget {
   /**
    * Construct a new cell type switcher.
    */
-  constructor(allProtocols: IDeAIProtocol, commands: CommandRegistry) {
+  constructor(serverData: IDeAIProtocol, commands: CommandRegistry) {
     super();
     this._commands = commands;
-    this._allProtocols = allProtocols;
+    this._serverData = serverData;
     this.addClass(TOOLBAR_CELLTYPE_CLASS);
   }
 
@@ -46,7 +46,7 @@ export class DeAISwitcher extends ReactWidget {
         value={'DeAI'}
       >
         <option value="DeAI">Run in...</option>
-        {Object.entries(this._allProtocols.availableProtocol).map(
+        {Object.entries(this._serverData.availableProtocol).map(
           ([key, value]) => {
             return (
               <option value={key} key={key}>
@@ -60,5 +60,5 @@ export class DeAISwitcher extends ReactWidget {
   }
 
   private _commands: CommandRegistry;
-  private _allProtocols: IDeAIProtocol;
+  private _serverData: IDeAIProtocol;
 }

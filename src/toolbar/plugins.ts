@@ -29,19 +29,19 @@ export namespace CommandIDs {
 class DeAIButton
   implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel>
 {
-  constructor(allProtocols: IDeAIProtocol, commands: CommandRegistry) {
+  constructor(serverData: IDeAIProtocol, commands: CommandRegistry) {
     this._commands = commands;
-    this._allProtocols = allProtocols;
+    this._serverData = serverData;
   }
 
   createNew(panel: NotebookPanel): IDisposable {
-    const button = new DeAISwitcher(this._allProtocols, this._commands);
+    const button = new DeAISwitcher(this._serverData, this._commands);
     panel.toolbar.insertAfter('cellType', 'bhlLab', button);
     return button;
   }
 
   private _commands: CommandRegistry;
-  private _allProtocols: IDeAIProtocol;
+  private _serverData: IDeAIProtocol;
 }
 
 export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
@@ -56,7 +56,7 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
   ],
   activate: (
     app: JupyterFrontEnd,
-    allProtocols: IDeAIProtocol,
+    serverData: IDeAIProtocol,
     notebooks: INotebookTracker | null
   ) => {
     function getCurrent(args: ReadonlyPartialJSONObject): NotebookPanel | null {
@@ -88,14 +88,19 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
             PathExt.extname(nbFullPath),
             ''
           );
+          const protocol = args['protocol'] as string;
           const path = PathExt.dirname(nbFullPath);
-          let newPath = PathExt.join(path, `${fileName}.bhl`);
+          let newPath = PathExt.join(
+            path,
+            `${fileName}.${protocol.toLowerCase()}.bhl`
+          );
           try {
             const newFile = await app.serviceManager.contents.get(newPath);
 
             const fileContent = JSON.parse(newFile.content);
             newPath = newFile.path;
             fileContent['protocol'] = args['protocol'];
+            fileContent['availableImage'] = serverData.availableImage;
             const content = JSON.stringify(fileContent);
 
             await app.serviceManager.contents.save(newPath, {
@@ -108,11 +113,15 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
               type: 'file',
               ext: '.bhl'
             });
+            const newContent = {
+              protocol: args['protocol'],
+              availableImage: serverData.availableImage
+            };
             await app.serviceManager.contents.save(newUntitled.path, {
               ...newUntitled,
               format: 'text',
               size: undefined,
-              content: `{\n\t"protocol": "${args['protocol']}"\n}`
+              content: JSON.stringify(newContent, undefined, 2)
             });
             await app.serviceManager.contents.rename(newUntitled.path, newPath);
           }
@@ -124,7 +133,7 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
       isEnabled
     });
 
-    const bhlButton = new DeAIButton(allProtocols, commands);
+    const bhlButton = new DeAIButton(serverData, commands);
     docRegistry.addWidgetExtension('Notebook', bhlButton);
   }
 };

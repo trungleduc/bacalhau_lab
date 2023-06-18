@@ -1,7 +1,10 @@
 {
   "protocol": "bacalhau",
   "availableImage": [
-    "tensorflow/tensorflow:latest",
-    "tensorflow/tensorflow:latest-gpu"
-  ]
+    "tensorflow/tensorflow-gpu:latest",
+    "pytorch/pytorch:3.24",
+    "python/python-mini:3.10"
+  ],
+  "dockerImage": "local-image",
+  "customDockerImage": "fasdasdasda"
 }

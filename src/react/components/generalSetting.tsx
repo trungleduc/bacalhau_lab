@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material';
+import { Stack, TextField } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -6,31 +6,27 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import * as React from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { reduxAction } from '../redux/slice';
-import { MuiFileInput } from 'mui-file-input';
 
 export function GeneralSetting() {
-  const [fileValue, setFileValue] = React.useState<File | null>(null);
   const dispatch = useAppDispatch();
-  const handleFileChange = React.useCallback(
-    (newValue: File | null) => {
-      if (!newValue) {
-        return;
-      }
-      newValue.text().then(text => {
-        console.log('text', text);
+  const dockerImage = useAppSelector(state => state.dockerImage);
+  const availableImages = useAppSelector(state => state.availableImage);
+  const customDockerImage = useAppSelector(state => state.customDockerImage);
 
-        dispatch(reduxAction.setDockerFileContent(text));
-      });
-      setFileValue(newValue);
+  const handleCustomImageChange = React.useCallback(
+    (newValue: string) => {
+      dispatch(reduxAction.setCustomDockerImage(newValue));
     },
     [dispatch]
   );
-  const availableImages = useAppSelector(state => state.availableImage);
-  const dockerImage = useAppSelector(state => state.dockerImage);
 
   const handleChange = React.useCallback(
     (e: SelectChangeEvent) => {
-      dispatch(reduxAction.setDockerImage(e.target.value));
+      const newVal = e.target.value;
+      dispatch(reduxAction.setDockerImage(newVal));
+      if (newVal !== 'local-image') {
+        dispatch(reduxAction.setCustomDockerImage(''));
+      }
     },
     [dispatch]
   );
@@ -54,17 +50,21 @@ export function GeneralSetting() {
               {value}
             </MenuItem>
           ))}
-          <MenuItem value="local-image">Local image</MenuItem>
+          <MenuItem value="local-image">Custom image</MenuItem>
         </Select>
       </FormControl>
-      <MuiFileInput
+      <TextField
+        InputLabelProps={{ shrink: true }}
         size="small"
-        placeholder={dockerImage !== 'local-image' ? 'Disabled' : ''}
-        onChange={handleFileChange}
-        label="Select docker file"
+        onChange={e => handleCustomImageChange(e.target.value)}
+        label={dockerImage !== 'local-image' ? 'Disabled' : 'Custom image'}
+        placeholder="Docker image name"
         disabled={dockerImage !== 'local-image'}
-        sx={{ '& .MuiFileInput-placeholder': { fontSize: '0.9rem' } }}
-        value={fileValue}
+        sx={{
+          '& .MuiInputBase-inputSizeSmall': { fontSize: '0.9rem' },
+          '& .MuiInputLabel-sizeSmall': { fontSize: '0.9rem' }
+        }}
+        value={customDockerImage}
       />
     </Stack>
   );

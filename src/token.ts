@@ -17,8 +17,7 @@ export interface IDict<T = any> {
   [key: string]: T;
 }
 export interface IDeAIProtocol {
-  availableProtocol: IDict<{ icon?: string }>;
-  availableImage: string[];
+  availableProtocol: IDict<{ icon?: string; availableImages: string[] }>;
 }
 
 export const IDeAIProtocol = new Token<IDeAIProtocol>(

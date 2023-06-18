@@ -18,13 +18,11 @@ const plugin: JupyterFrontEndPlugin<IDeAIProtocol> = {
   activate: (app: JupyterFrontEnd): IDeAIProtocol => {
     console.log('JupyterLab extension bacalhau_lab is activated!');
     const deaiData: IDeAIProtocol = {
-      availableProtocol: {},
-      availableImage: []
+      availableProtocol: {}
     };
     requestAPI<{ payload: IDict }>()
       .then(data => {
         deaiData.availableProtocol = data.payload['availableProtocol'];
-        deaiData.availableImage = data.payload['availableImage'];
       })
       .catch(reason => {
         console.error(

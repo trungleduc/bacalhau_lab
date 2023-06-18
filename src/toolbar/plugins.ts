@@ -99,8 +99,10 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
 
             const fileContent = JSON.parse(newFile.content);
             newPath = newFile.path;
-            fileContent['protocol'] = args['protocol'];
-            fileContent['availableImage'] = serverData.availableImage;
+            const protocol = args['protocol'] as string;
+            fileContent['protocol'] = protocol;
+            fileContent['availableImage'] =
+              serverData.availableProtocol[protocol].availableImages;
             const content = JSON.stringify(fileContent);
 
             await app.serviceManager.contents.save(newPath, {
@@ -113,9 +115,11 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
               type: 'file',
               ext: '.bhl'
             });
+            const protocol = args['protocol'] as string;
             const newContent = {
-              protocol: args['protocol'],
-              availableImage: serverData.availableImage
+              protocol: protocol,
+              availableImage:
+                serverData.availableProtocol[protocol].availableImages
             };
             await app.serviceManager.contents.save(newUntitled.path, {
               ...newUntitled,

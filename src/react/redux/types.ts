@@ -1,7 +1,7 @@
 export interface IDeAIState {
   protocol?: string;
   dockerImage?: string;
-  dockerFile?: string;
+  customDockerImage?: string;
   availableImage: string[];
   resource: { type: string; value: string }[];
 }

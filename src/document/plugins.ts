@@ -30,7 +30,8 @@ export const bhlPlugin: JupyterFrontEndPlugin<IBhlViewerTracker> = {
       defaultFor: ['bhl'],
       rendermime,
       commands: app.commands,
-      themeManager
+      themeManager,
+      serviceManager: app.serviceManager
     });
     widgetFactory.widgetCreated.connect((_, widget) => {
       widget.context.pathChanged.connect(() => {

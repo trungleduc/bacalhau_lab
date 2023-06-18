@@ -8,8 +8,27 @@ import * as React from 'react';
 
 import StyledAccordion from './components/styledAccordion';
 import { GeneralSetting } from './components/generalSetting';
+import { ResourceSetting } from './components/resourceSetting';
+import { useJupyter } from './provider/jupyter';
+import { useAppSelector } from './redux/hooks';
 
 export function ControlPanel() {
+  const jupyterContext = useJupyter();
+  const docContent = useAppSelector(state => state);
+
+  const saveDocument = React.useCallback(async () => {
+    const { context, serviceManager } = jupyterContext;
+    if (!context || !serviceManager) {
+      return;
+    }
+
+    const path = context.path;
+    const currentFile = await serviceManager.contents.get(path);
+    await serviceManager.contents.save(context.path, {
+      ...currentFile,
+      content: JSON.stringify(docContent, null, 2)
+    });
+  }, [jupyterContext, docContent]);
   return (
     <Box className="jp-deai-control-panel">
       <AppBar position="static" sx={{ marginBottom: '20px' }}>
@@ -29,15 +48,10 @@ export function ControlPanel() {
         />
         <StyledAccordion
           title="RESOURCE SETTINGS"
-          panel={
-            <p>
-              Nulla facilisi. Phasellus sollicitudin nulla et quam mattis
-              feugiat. Aliquam eget maximus est, id dignissim quam.
-            </p>
-          }
+          panel={<ResourceSetting />}
           defaultExpanded={true}
         />
-        <StyledAccordion
+        {/* <StyledAccordion
           title="ADVANCED SETTINGS"
           panel={
             <p>
@@ -46,13 +60,14 @@ export function ControlPanel() {
             </p>
           }
           defaultExpanded={true}
-        />
+        /> */}
       </Container>
       <Card elevation={5}>
         <BottomNavigation showLabels>
           <BottomNavigationAction
             label="SAVE"
             icon={<Save color="warning" />}
+            onClick={saveDocument}
           />
           <BottomNavigationAction
             color="primary"

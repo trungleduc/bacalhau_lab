@@ -8,7 +8,7 @@ export const INITIAL_STATE: IDeAIState = {
     'tensorflow/tensorflow:latest-gpu'
   ],
   dockerImage: undefined,
-  dockerFile: undefined,
+  customDockerImage: undefined,
   resource: []
 };
 
@@ -23,8 +23,11 @@ export const slice = createSlice({
     setDockerImage: (state, action: PayloadAction<string>) => {
       return { ...state, dockerImage: action.payload };
     },
-    setDockerFileContent: (state, action: PayloadAction<string>) => {
-      return { ...state, dockerFile: action.payload };
+    setCustomDockerImage: (
+      state,
+      action: PayloadAction<string | undefined>
+    ) => {
+      return { ...state, customDockerImage: action.payload };
     }
   }
 });

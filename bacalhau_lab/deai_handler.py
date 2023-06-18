@@ -23,11 +23,14 @@ def init_data():
     for Protocol in AVAILABLE_PROTOCOLS:
         protocol: DeProtocol = Protocol()
         name = protocol.get_name()
+        get_docker_images = getattr(protocol, "get_docker_images", None)
+        if get_docker_images is not None:
+            available_images = get_docker_images()
+        else:
+            available_images = []
+
         data["availableProtocol"][name] = dict(
             icon=content_from_path(protocol.get_icon()),
+            availableImages=available_images,
         )
-    data["availableImage"] = [
-        "tensorflow/tensorflow:latest",
-        "tensorflow/tensorflow:latest-gpu",
-    ]
     return data

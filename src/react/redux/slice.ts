@@ -9,7 +9,7 @@ export const INITIAL_STATE: IDeAIState = {
   ],
   dockerImage: undefined,
   customDockerImage: undefined,
-  resource: []
+  resources: {}
 };
 
 export const slice = createSlice({
@@ -28,9 +28,57 @@ export const slice = createSlice({
       action: PayloadAction<string | undefined>
     ) => {
       return { ...state, customDockerImage: action.payload };
+    },
+    addResource: (state, action: PayloadAction<string>) => {
+      const id = action.payload;
+      return {
+        ...state,
+        resources: { ...state.resources, [id]: { type: 'file', value: null } }
+      };
+    },
+    removeResource: (state, action: PayloadAction<string>) => {
+      const id = action.payload;
+      const currentResource = { ...state.resources };
+      if (currentResource[id]) {
+        delete currentResource[id];
+      }
+      return {
+        ...state,
+        resources: currentResource
+      };
+    },
+    updateResource: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        resource: { type?: string; value?: string | null };
+      }>
+    ) => {
+      const { id, resource } = action.payload;
+      const currentResource = { ...state.resources };
+      if (currentResource[id]) {
+        const updated = { ...currentResource[id], ...resource };
+
+        return {
+          ...state,
+          resources: { ...state.resources, [id]: updated }
+        };
+      } else {
+        return { ...state };
+      }
     }
   }
 });
+
+export const selectResource = (
+  state: IDeAIState,
+  resourceId: string
+): {
+  type: string;
+  value: string | null;
+} => {
+  return state.resources[resourceId];
+};
 
 export const reduxAction = slice.actions;
 export default slice.reducer;

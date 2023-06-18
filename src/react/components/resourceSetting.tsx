@@ -1,21 +1,25 @@
 import { Button, Stack, Box } from '@mui/material';
 import * as React from 'react';
 import { ResourceRow } from './resourceRow';
-import { IDict } from '../../token';
 import { UUID } from '@lumino/coreutils';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { reduxAction } from '../redux/slice';
 export function ResourceSetting() {
-  const [resource, setResource] = React.useState<IDict>({});
+  const resources = useAppSelector(state => state.resources);
+  const dispatch = useAppDispatch();
   const addRes = React.useCallback(() => {
     const newId = UUID.uuid4();
-    setResource(old => ({ ...old, [newId]: 1 }));
-  }, [setResource]);
+    dispatch(reduxAction.addResource(newId));
+  }, [dispatch]);
   return (
     <Stack spacing={2} className="jp-deai-resource-setting">
-      {Object.entries(resource).map(([key, val], idx) => (
-        <ResourceRow key={key} />
+      {Object.keys(resources ?? {}).map(key => (
+        <ResourceRow key={key} resourceId={key} />
       ))}
       <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <Button onClick={addRes}>Add resource</Button>
+        <Button variant="outlined" onClick={addRes}>
+          Add resource
+        </Button>
       </Box>
     </Stack>
   );

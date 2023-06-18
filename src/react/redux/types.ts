@@ -1,7 +1,9 @@
+import { IDict } from '../../token';
+
 export interface IDeAIState {
   protocol?: string;
   dockerImage?: string;
   customDockerImage?: string;
   availableImage: string[];
-  resource: { type: string; value: string }[];
+  resources: IDict<{ type: string; value: string | null }>;
 }

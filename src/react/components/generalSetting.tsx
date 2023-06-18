@@ -33,7 +33,10 @@ export function GeneralSetting() {
   return (
     <Stack spacing={2} className="jp-deai-general-setting">
       <FormControl sx={{ width: '100%' }} size="small">
-        <InputLabel id="demo-simple-select-helper-label">
+        <InputLabel
+          id="demo-simple-select-helper-label"
+          sx={{ fontSize: '0.9rem' }}
+        >
           Select docker image
         </InputLabel>
         <Select

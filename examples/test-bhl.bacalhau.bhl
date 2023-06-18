@@ -5,6 +5,18 @@
     "pytorch/pytorch:3.24",
     "python/python-mini:3.10"
   ],
-  "dockerImage": "local-image",
-  "customDockerImage": "fasdasdasda"
+  "resources": {
+    "1dd177af-6ac8-4c6d-a849-9163602380cc": {
+      "type": "file",
+      "value": "c:/asd/asd/ef"
+    },
+    "82e9b1d4-c926-4a0d-853c-b2517b83a929": {
+      "type": "url",
+      "value": "google.com"
+    },
+    "cb792774-4389-4ea2-b73f-534a2f239bb0": {
+      "type": "ipfs",
+      "value": "123456"
+    }
+  }
 }

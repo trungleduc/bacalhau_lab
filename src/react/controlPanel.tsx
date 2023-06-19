@@ -11,11 +11,13 @@ import { GeneralSetting } from './components/generalSetting';
 import { ResourceSetting } from './components/resourceSetting';
 import { useJupyter } from './provider/jupyter';
 import { useAppSelector } from './redux/hooks';
+import { requestAPI } from '../handler';
+import { IDict } from '../token';
 
 export function ControlPanel() {
   const jupyterContext = useJupyter();
   const docContent = useAppSelector(state => state);
-
+  const [error, setError] = React.useState<IDict>({});
   const saveDocument = React.useCallback(async () => {
     const { context, serviceManager } = jupyterContext;
     if (!context || !serviceManager) {
@@ -28,6 +30,37 @@ export function ControlPanel() {
       ...currentFile,
       content: JSON.stringify(docContent, null, 2)
     });
+  }, [jupyterContext, docContent]);
+
+  const execute = React.useCallback(async () => {
+    const { context, serviceManager } = jupyterContext;
+    if (!context || !serviceManager) {
+      return;
+    }
+
+    const path = context.path;
+    const currentFile = await serviceManager.contents.get(path);
+    await serviceManager.contents.save(context.path, {
+      ...currentFile,
+      content: JSON.stringify(docContent, null, 2)
+    });
+
+    const checked = await requestAPI<{ action: string; payload: IDict }>('', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'CHECK_DATA',
+        payload: docContent
+      })
+    });
+    const { payload } = checked;
+    const newError: IDict = {};
+    Object.entries(payload).forEach(([key, value]) => {
+      if (!value?.validated) {
+        newError[key] = value?.message;
+      }
+    });
+
+    setError(newError);
   }, [jupyterContext, docContent]);
   return (
     <Box className="jp-deai-control-panel">
@@ -48,19 +81,9 @@ export function ControlPanel() {
         />
         <StyledAccordion
           title="RESOURCE SETTINGS"
-          panel={<ResourceSetting />}
+          panel={<ResourceSetting error={error} />}
           defaultExpanded={true}
         />
-        {/* <StyledAccordion
-          title="ADVANCED SETTINGS"
-          panel={
-            <p>
-              Nulla facilisi. Phasellus sollicitudin nulla et quam mattis
-              feugiat. Aliquam eget maximus est, id dignissim quam.
-            </p>
-          }
-          defaultExpanded={true}
-        /> */}
       </Container>
       <Card elevation={5}>
         <BottomNavigation showLabels>
@@ -68,10 +91,12 @@ export function ControlPanel() {
             label="SAVE"
             icon={<Save color="warning" />}
             onClick={saveDocument}
+            sx={{ display: 'none' }}
           />
           <BottomNavigationAction
             color="primary"
             label="RUN"
+            onClick={execute}
             icon={<PlayCircle color="primary" />}
           />
           <BottomNavigationAction

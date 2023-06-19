@@ -11,8 +11,11 @@ import { SmallTextField } from './smallTextField';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { reduxAction, selectResource } from '../redux/slice';
 
-export function ResourceRow(props: { resourceId: string }) {
-  const { resourceId } = props;
+export function ResourceRow(props: {
+  resourceId: string;
+  error: string | undefined;
+}) {
+  const { resourceId, error } = props;
   const resource = useAppSelector(state => selectResource(state, resourceId));
   const dispatch = useAppDispatch();
 
@@ -76,6 +79,8 @@ export function ResourceRow(props: { resourceId: string }) {
           }}
           fullWidth
           onChange={e => void updateResource({ value: e.target.value as any })}
+          error={Boolean(error)}
+          helperText={error}
         />
       </FormControl>
       <Button

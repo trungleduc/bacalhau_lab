@@ -1,7 +1,9 @@
+import os
+from typing import Dict
 from deairequest import BacalhauProtocol, ErrorProtocol, DeProtocol
 from enum import Enum
 
-from .tools import content_from_path
+from .tools import check_site_exist, content_from_path
 
 
 class DeProtocolEnum(str, Enum):
@@ -34,3 +36,23 @@ def init_data():
             availableImages=available_images,
         )
     return data
+
+
+def check_data(data: Dict) -> Dict:
+    resources = data.get("resources", {})
+    response = {}
+    for key, value in resources.items():
+        exist = True
+        if value["type"] == "file":
+            exist = os.path.exists(value["value"])
+            response[key] = {"validated": exist, "message": None}
+            if not exist:
+                response[key]["message"] = "Resource is not available"
+        elif value["type"] == "url":
+            exist = check_site_exist(value["value"])
+
+        response[key] = {"validated": exist, "message": None}
+        if not exist:
+            response[key]["message"] = "Resource is not available"
+
+    return response

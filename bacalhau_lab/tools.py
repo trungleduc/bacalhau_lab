@@ -1,4 +1,8 @@
+from http import HTTPStatus
 from pathlib import Path
+from urllib.parse import urlparse
+
+import requests
 
 
 def content_from_path(path: str | Path) -> str:
@@ -17,3 +21,12 @@ def content_from_path(path: str | Path) -> str:
     except Exception:
         content = None
     return content
+
+
+def check_site_exist(url) -> bool:
+    try:
+        url_parts = urlparse(url)
+        request = requests.head("://".join([url_parts.scheme, url_parts.netloc]))
+        return request.status_code == HTTPStatus.OK
+    except Exception:
+        return False

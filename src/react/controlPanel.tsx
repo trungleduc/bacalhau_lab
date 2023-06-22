@@ -75,12 +75,12 @@ export function ControlPanel() {
       </AppBar>
       <Container maxWidth="md" sx={{ flexGrow: 1, overflow: 'auto' }}>
         <StyledAccordion
-          title="GENERAL SETTINGS"
+          title="DOCKER IMAGE"
           panel={<GeneralSetting />}
           defaultExpanded={true}
         />
         <StyledAccordion
-          title="RESOURCE SETTINGS"
+          title="DATA SOURCES"
           panel={<ResourceSetting error={error} />}
           defaultExpanded={true}
         />

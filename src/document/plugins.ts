@@ -25,9 +25,9 @@ export const bhlPlugin: JupyterFrontEndPlugin<IBhlViewerTracker> = {
       namespace: 'bhl-lab:widgets'
     });
     const widgetFactory = new BhlDocWidgetFactory({
-      name: 'Bacalhau Lab',
-      fileTypes: ['bhl'],
-      defaultFor: ['bhl'],
+      name: 'DeAI',
+      fileTypes: ['deai'],
+      defaultFor: ['deai'],
       rendermime,
       commands: app.commands,
       themeManager,
@@ -42,11 +42,11 @@ export const bhlPlugin: JupyterFrontEndPlugin<IBhlViewerTracker> = {
     app.docRegistry.addWidgetFactory(widgetFactory);
     // register the filetype
     app.docRegistry.addFileType({
-      name: 'bhl',
+      name: 'deai',
       icon: bhlIcon,
-      displayName: 'BHL',
+      displayName: 'DEAI',
       mimeTypes: ['text/json'],
-      extensions: ['.bhl', '.BHL'],
+      extensions: ['.deai', '.DEAI'],
       fileFormat: 'json',
       contentType: 'file'
     });

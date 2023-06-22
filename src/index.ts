@@ -22,6 +22,8 @@ const plugin: JupyterFrontEndPlugin<IDeAIProtocol> = {
     };
     requestAPI<{ payload: IDict }>()
       .then(data => {
+        console.log('data', data);
+
         deaiData.availableProtocol = data.payload['availableProtocol'];
       })
       .catch(reason => {

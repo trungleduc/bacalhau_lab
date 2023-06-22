@@ -81,6 +81,8 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
     commands.addCommand(CommandIDs.bhlOpen, {
       label: 'Open in Bacalhau Lab',
       execute: async args => {
+        console.log('args', args);
+
         const current = getCurrent(args);
         if (current) {
           const nbFullPath = current.context.path;
@@ -89,17 +91,18 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
             ''
           );
           const protocol = args['protocol'] as string;
+          const ext = args['ext'] as string;
           const path = PathExt.dirname(nbFullPath);
           let newPath = PathExt.join(
             path,
-            `${fileName}.${protocol.toLowerCase()}.bhl`
+            `${fileName}.${ext.toLowerCase()}.deai`
           );
           try {
             const newFile = await app.serviceManager.contents.get(newPath);
 
             const fileContent = JSON.parse(newFile.content);
             newPath = newFile.path;
-            const protocol = args['protocol'] as string;
+
             fileContent['protocol'] = protocol;
             fileContent['availableImage'] =
               serverData.availableProtocol[protocol].availableImages;
@@ -113,9 +116,8 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
             const newUntitled = await app.serviceManager.contents.newUntitled({
               path: path,
               type: 'file',
-              ext: '.bhl'
+              ext: '.deai'
             });
-            const protocol = args['protocol'] as string;
             const newContent = {
               protocol: protocol,
               availableImage:

@@ -22,8 +22,10 @@ export class DeAISwitcher extends ReactWidget {
    * Handle `change` events for the HTMLSelect component.
    */
   handleChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
+    const protocol = event.target.value;
     this._commands.execute('notebook:open-with-bhl', {
-      protocol: event.target.value
+      protocol,
+      ext: this._serverData.availableProtocol[protocol].ext
     });
     this.update();
   };

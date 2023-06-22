@@ -1,4 +1,4 @@
-import { Stack, TextField } from '@mui/material';
+import { Stack, TextField, Typography } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -32,6 +32,10 @@ export function GeneralSetting() {
   );
   return (
     <Stack spacing={2} className="jp-deai-general-setting">
+      <Typography sx={{ fontSize: '0.85rem' }}>
+        Please select the Docker image which you want the Bacalhau node to use
+        to run your code in.
+      </Typography>
       <FormControl sx={{ width: '100%' }} size="small">
         <InputLabel
           id="demo-simple-select-helper-label"
@@ -65,7 +69,8 @@ export function GeneralSetting() {
         disabled={dockerImage !== 'local-image'}
         sx={{
           '& .MuiInputBase-inputSizeSmall': { fontSize: '0.9rem' },
-          '& .MuiInputLabel-sizeSmall': { fontSize: '0.9rem' }
+          '& .MuiInputLabel-sizeSmall': { fontSize: '0.9rem' },
+          display: dockerImage !== 'local-image' ? 'none' : 'flex'
         }}
         value={customDockerImage}
       />

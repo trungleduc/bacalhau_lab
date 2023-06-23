@@ -81,8 +81,6 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
     commands.addCommand(CommandIDs.bhlOpen, {
       label: 'Open in Bacalhau Lab',
       execute: async args => {
-        console.log('args', args);
-
         const current = getCurrent(args);
         if (current) {
           const nbFullPath = current.context.path;

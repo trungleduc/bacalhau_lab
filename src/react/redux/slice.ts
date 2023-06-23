@@ -3,10 +3,7 @@ import { IDeAIState } from './types';
 
 export const INITIAL_STATE: IDeAIState = {
   protocol: undefined,
-  availableImage: [
-    'tensorflow/tensorflow:latest',
-    'tensorflow/tensorflow:latest-gpu'
-  ],
+  availableImage: [],
   dockerImage: undefined,
   customDockerImage: undefined,
   resources: {}

@@ -52,7 +52,7 @@ export class DeAISwitcher extends ReactWidget {
           ([key, value]) => {
             return (
               <option value={key} key={key}>
-                {key.toUpperCase()}
+                {key}
               </option>
             );
           }

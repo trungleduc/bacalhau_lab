@@ -48,3 +48,4 @@ repos:
           - '@typescript-eslint/parser'
           - 'eslint-plugin-prettier'
           - 'eslint-config-prettier'
+          - 'eslint-plugin-react-hooks'

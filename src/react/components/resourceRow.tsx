@@ -10,6 +10,7 @@ import * as React from 'react';
 import { SmallTextField } from './smallTextField';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { reduxAction, selectResource } from '../redux/slice';
+import { IDeAIResource } from '../redux/types';
 
 export function ResourceRow(props: {
   resourceId: string;
@@ -20,7 +21,7 @@ export function ResourceRow(props: {
   const dispatch = useAppDispatch();
 
   const updateResource = React.useCallback(
-    (newResource: { type?: string; value?: string | null }) => {
+    (newResource: Partial<IDeAIResource>) => {
       dispatch(
         reduxAction.updateResource({ id: resourceId, resource: newResource })
       );
@@ -51,9 +52,7 @@ export function ResourceRow(props: {
   return (
     <Stack direction={'row'} spacing={2}>
       <FormControl sx={{ width: '20%' }} size="small">
-        <InputLabel id="demo-simple-select-helper-label">
-          Resource type
-        </InputLabel>
+        <InputLabel>Resource type</InputLabel>
         <Select
           value={resource.type}
           label="Resource type"
@@ -69,7 +68,7 @@ export function ResourceRow(props: {
           <MenuItem value="ipfs">IPFS</MenuItem>
         </Select>
       </FormControl>
-      <FormControl size="small" sx={{ width: '60%' }}>
+      <FormControl size="small" sx={{ width: '50%' }}>
         <SmallTextField
           value={resource.value}
           size="small"
@@ -83,11 +82,29 @@ export function ResourceRow(props: {
           helperText={error}
         />
       </FormControl>
+      <FormControl sx={{ width: '15%' }} size="small">
+        <InputLabel>Encrypt data</InputLabel>
+        <Select
+          value={resource.encryption ? 1 : 0}
+          label="Encrypt data"
+          sx={{
+            '& .MuiInputBase-inputSizeSmall': { fontSize: '0.9rem' }
+          }}
+          fullWidth
+          onChange={e =>
+            void updateResource({ encryption: Boolean(e.target.value) })
+          }
+          size="small"
+        >
+          <MenuItem value={1}>Yes</MenuItem>
+          <MenuItem value={0}>No</MenuItem>
+        </Select>
+      </FormControl>
       <Button
         variant="outlined"
         color="warning"
         size="small"
-        sx={{ width: '20%' }}
+        sx={{ width: '15%' }}
         onClick={remove}
       >
         Remove

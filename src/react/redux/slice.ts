@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { IDeAIState } from './types';
+import { IDeAIResource, IDeAIState } from './types';
 
 export const INITIAL_STATE: IDeAIState = {
   protocol: undefined,
@@ -30,7 +30,10 @@ export const slice = createSlice({
       const id = action.payload;
       return {
         ...state,
-        resources: { ...state.resources, [id]: { type: 'file', value: null } }
+        resources: {
+          ...state.resources,
+          [id]: { type: 'file', value: null, encryption: true }
+        }
       };
     },
     removeResource: (state, action: PayloadAction<string>) => {
@@ -48,7 +51,7 @@ export const slice = createSlice({
       state,
       action: PayloadAction<{
         id: string;
-        resource: { type?: string; value?: string | null };
+        resource: Partial<IDeAIResource>;
       }>
     ) => {
       const { id, resource } = action.payload;
@@ -70,12 +73,10 @@ export const slice = createSlice({
 export const selectResource = (
   state: IDeAIState,
   resourceId: string
-): {
-  type: string;
-  value: string | null;
-} => {
+): IDeAIResource => {
   return state.resources[resourceId];
 };
 
 export const reduxAction = slice.actions;
+
 export default slice.reducer;

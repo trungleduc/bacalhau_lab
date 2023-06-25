@@ -18,3 +18,16 @@
 .split-view-view:not(:first-child)::before {
   width: 2px !important;
 }
+
+.jp-deai-logLine {
+  margin: 0;
+  padding: 2px;
+  font-size: 0.9rem;
+  margin-left: 5px;
+  width: calc(100% - 85px);
+}
+
+.jp-deai-logTimestamp {
+  max-height: 22px;
+  width: 80px;
+}

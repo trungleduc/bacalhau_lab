@@ -8,9 +8,6 @@ import { reduxAction } from '../react/redux/slice';
 import { ColorModeProvider } from '../react/provider/theme';
 import { JupyterContext } from '../react/provider/jupyter';
 import { ServiceManager } from '@jupyterlab/services';
-import { ToolkitStore } from '@reduxjs/toolkit/dist/configureStore';
-import { IDeAIState } from '../react/redux/types';
-import { AnyAction, ThunkMiddleware } from '@reduxjs/toolkit';
 
 export class DeAIPanel extends ReactWidget {
   /**
@@ -49,11 +46,7 @@ export class DeAIPanel extends ReactWidget {
     );
   }
 
-  private _store: ToolkitStore<
-    IDeAIState,
-    AnyAction,
-    [ThunkMiddleware<IDeAIState, AnyAction>]
-  >;
+  private _store: any;
 }
 
 namespace DeAIPanel {

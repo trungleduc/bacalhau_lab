@@ -2,12 +2,18 @@ import { Stack, TextField, Typography } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import FormHelperText from '@mui/material/FormHelperText';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import * as React from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { reduxAction } from '../redux/slice';
 
-export function GeneralSetting() {
+export function GeneralSetting(props: {
+  error: {
+    el: 'dockerSelector' | 'customImage';
+    msg: string;
+  } | null;
+}) {
   const dispatch = useAppDispatch();
   const dockerImage = useAppSelector(state => state.dockerImage);
   const availableImages = useAppSelector(state => state.availableImage);
@@ -36,7 +42,11 @@ export function GeneralSetting() {
         Please select the Docker image which you want the Bacalhau node to use
         to run your code in.
       </Typography>
-      <FormControl sx={{ width: '100%' }} size="small">
+      <FormControl
+        sx={{ width: '100%' }}
+        size="small"
+        error={props.error?.el === 'dockerSelector'}
+      >
         <InputLabel
           id="demo-simple-select-helper-label"
           sx={{ fontSize: '0.9rem' }}
@@ -59,6 +69,9 @@ export function GeneralSetting() {
           ))}
           <MenuItem value="local-image">Custom image</MenuItem>
         </Select>
+        <FormHelperText>
+          {props.error?.el === 'dockerSelector' ? props.error?.msg ?? '' : ''}
+        </FormHelperText>
       </FormControl>
       <TextField
         InputLabelProps={{ shrink: true }}
@@ -73,6 +86,8 @@ export function GeneralSetting() {
           display: dockerImage !== 'local-image' ? 'none' : 'flex'
         }}
         value={customDockerImage}
+        error={props.error?.el === 'customImage'}
+        helperText={props.error?.msg ?? ''}
       />
     </Stack>
   );

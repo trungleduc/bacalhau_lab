@@ -104,7 +104,7 @@ export function ResourceRow(props: {
         variant="outlined"
         color="warning"
         size="small"
-        sx={{ width: '15%' }}
+        sx={{ width: '15%', maxHeight: '40px' }}
         onClick={remove}
       >
         Remove

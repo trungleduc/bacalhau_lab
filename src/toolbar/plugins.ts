@@ -17,7 +17,8 @@ import { ReadonlyPartialJSONObject } from '@lumino/coreutils';
 import { IDisposable } from '@lumino/disposable';
 
 import { DeAISwitcher } from './widget';
-import { IDeAIProtocol } from '../token';
+import { IDeAIProtocol, IDict } from '../token';
+import { IDeAIState } from '../react/redux/types';
 
 /**
  * The command IDs used by the plugin.
@@ -88,13 +89,11 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
             PathExt.extname(nbFullPath),
             ''
           );
+          const nbContent = current.context.model.toJSON() as IDict;
           const protocol = args['protocol'] as string;
           const ext = args['ext'] as string;
           const path = PathExt.dirname(nbFullPath);
-          let newPath = PathExt.join(
-            path,
-            `${fileName}.${ext.toLowerCase()}.deai`
-          );
+          let newPath = PathExt.join(path, `${fileName}.${ext}.deai`);
           try {
             const newFile = await app.serviceManager.contents.get(newPath);
 
@@ -104,6 +103,7 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
             fileContent['protocol'] = protocol;
             fileContent['availableImage'] =
               serverData.availableProtocol[protocol].availableImages;
+            fileContent['notebook'] = nbContent;
             const content = JSON.stringify(fileContent);
 
             await app.serviceManager.contents.save(newPath, {
@@ -116,10 +116,12 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
               type: 'file',
               ext: '.deai'
             });
-            const newContent = {
+            const newContent: IDeAIState = {
               protocol: protocol,
               availableImage:
-                serverData.availableProtocol[protocol].availableImages
+                serverData.availableProtocol[protocol].availableImages,
+              resources: {},
+              notebook: nbContent
             };
             await app.serviceManager.contents.save(newUntitled.path, {
               ...newUntitled,

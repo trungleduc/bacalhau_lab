@@ -10,14 +10,41 @@ import StyledAccordion from './components/styledAccordion';
 import { GeneralSetting } from './components/generalSetting';
 import { ResourceSetting } from './components/resourceSetting';
 import { useJupyter } from './provider/jupyter';
-import { useAppSelector } from './redux/hooks';
+import { useAppDispatch, useAppSelector } from './redux/hooks';
 import { requestAPI } from '../handler';
 import { IDict } from '../token';
+import { reduxAction } from './redux/slice';
 
 export function ControlPanel() {
   const jupyterContext = useJupyter();
   const docContent = useAppSelector(state => state);
+  const { dockerImage, customDockerImage } = docContent;
   const [error, setError] = React.useState<IDict>({});
+  const [dockerError, setDockerError] = React.useState<{
+    el: 'dockerSelector' | 'customImage';
+    msg: string;
+  } | null>(null);
+  const dispatch = useAppDispatch();
+  React.useEffect(
+    () => () => {
+      dispatch(reduxAction.togglePolling({ startPolling: false }));
+    },
+    [dispatch]
+  );
+  React.useEffect(() => {
+    if (dockerImage && dockerImage !== 'local-image') {
+      setDockerError(null);
+      return;
+    }
+    if (
+      dockerImage === 'local-image' &&
+      customDockerImage &&
+      customDockerImage.length > 0
+    ) {
+      setDockerError(null);
+      return;
+    }
+  }, [dockerImage, customDockerImage]);
   const saveDocument = React.useCallback(async () => {
     const { context, serviceManager } = jupyterContext;
     if (!context || !serviceManager) {
@@ -33,6 +60,17 @@ export function ControlPanel() {
   }, [jupyterContext, docContent]);
 
   const execute = React.useCallback(async () => {
+    if (!dockerImage || dockerImage.length === 0) {
+      setDockerError({ el: 'dockerSelector', msg: 'Missing image' });
+      return;
+    }
+    if (
+      dockerImage === 'local-image' &&
+      (!customDockerImage || customDockerImage.length === 0)
+    ) {
+      setDockerError({ el: 'customImage', msg: 'Missing image' });
+      return;
+    }
     const { context, serviceManager } = jupyterContext;
     if (!context || !serviceManager) {
       return;
@@ -40,28 +78,49 @@ export function ControlPanel() {
 
     const path = context.path;
     const currentFile = await serviceManager.contents.get(path);
+    const contentWithoutLog = JSON.parse(JSON.stringify(docContent));
+    delete contentWithoutLog['log'];
     await serviceManager.contents.save(context.path, {
       ...currentFile,
-      content: JSON.stringify(docContent, null, 2)
+      content: JSON.stringify(contentWithoutLog, null, 2)
     });
 
-    const checked = await requestAPI<{ action: string; payload: IDict }>('', {
+    const response = await requestAPI<{
+      action: 'RESOURCE_ERROR' | 'EXECUTING' | 'EXECUTED' | 'EXECUTION_ERROR';
+      payload: IDict;
+    }>('', {
       method: 'POST',
       body: JSON.stringify({
-        action: 'CHECK_DATA',
+        action: 'EXECUTE',
         payload: docContent
       })
     });
-    const { payload } = checked;
-    const newError: IDict = {};
-    Object.entries(payload).forEach(([key, value]) => {
-      if (!value?.validated) {
-        newError[key] = value?.message;
+    const { action, payload } = response;
+    switch (action) {
+      case 'RESOURCE_ERROR': {
+        const newError: IDict = {};
+        Object.entries(payload).forEach(([key, value]) => {
+          if (!value?.validated) {
+            newError[key] = value?.message;
+          }
+        });
+        dispatch(reduxAction.logError('Resource Error!'));
+        setError(newError);
+        break;
       }
-    });
+      case 'EXECUTING': {
+        const { jobId } = payload;
+        dispatch(reduxAction.logInfo(`Executing job with id ${jobId}`));
+        dispatch(reduxAction.togglePolling({ startPolling: true, jobId }));
+        break;
+      }
+      case 'EXECUTION_ERROR':
+        break;
+      default:
+        break;
+    }
+  }, [jupyterContext, docContent, dockerImage, customDockerImage, dispatch]);
 
-    setError(newError);
-  }, [jupyterContext, docContent]);
   return (
     <Box className="jp-deai-control-panel">
       <AppBar position="static" sx={{ marginBottom: '20px' }}>
@@ -76,7 +135,7 @@ export function ControlPanel() {
       <Container maxWidth="md" sx={{ flexGrow: 1, overflow: 'auto' }}>
         <StyledAccordion
           title="DOCKER IMAGE"
-          panel={<GeneralSetting />}
+          panel={<GeneralSetting error={dockerError} />}
           defaultExpanded={true}
         />
         <StyledAccordion

@@ -6,7 +6,8 @@ export const INITIAL_STATE: IDeAIState = {
   availableImage: [],
   dockerImage: undefined,
   customDockerImage: undefined,
-  resources: {}
+  resources: {},
+  polling: false
 };
 
 export const slice = createSlice({
@@ -66,7 +67,42 @@ export const slice = createSlice({
       } else {
         return { ...state };
       }
-    }
+    },
+    logError: (state, action: PayloadAction<string>) => {
+      const currentLog = state.log ?? [];
+      const currentDate = new Date();
+      const timestamp = currentDate.getTime();
+      return {
+        ...state,
+        log: [
+          ...currentLog,
+          { level: 'error', content: action.payload, timestamp }
+        ]
+      };
+    },
+    logInfo: (state, action: PayloadAction<string>) => {
+      const currentLog = state.log ?? [];
+      const currentDate = new Date();
+      const timestamp = currentDate.getTime();
+      return {
+        ...state,
+        log: [
+          ...currentLog,
+          { level: 'info', content: action.payload, timestamp }
+        ]
+      };
+    },
+    togglePolling: (
+      state,
+      action: PayloadAction<{ startPolling: boolean; jobId?: string }>
+    ) => ({
+      ...state,
+      polling: action.payload.startPolling
+    }),
+    stopPolling: state => ({
+      ...state,
+      polling: false
+    })
   }
 });
 

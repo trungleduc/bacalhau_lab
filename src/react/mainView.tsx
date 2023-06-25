@@ -5,6 +5,7 @@ import { Allotment } from 'allotment';
 import * as React from 'react';
 
 import { ControlPanel } from './controlPanel';
+import { LogPanel } from './logPanel';
 
 export function MainView() {
   return (
@@ -19,9 +20,7 @@ export function MainView() {
           <ControlPanel></ControlPanel>
         </Allotment.Pane>
         <Allotment.Pane snap={false} minSize={300}>
-          <Box className="jp-LogConsolePanel">
-            <div className="jp-LogConsoleListPlaceholder">No log messages.</div>
-          </Box>
+          <LogPanel />
         </Allotment.Pane>
       </Allotment>
     </Box>

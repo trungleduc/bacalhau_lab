@@ -95,7 +95,9 @@ export function ControlPanel() {
         payload: docContent
       })
     });
+
     const { action, payload } = response;
+
     switch (action) {
       case 'RESOURCE_ERROR': {
         const newError: IDict = {};

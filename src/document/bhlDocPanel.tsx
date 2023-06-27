@@ -8,6 +8,7 @@ import { reduxAction } from '../react/redux/slice';
 import { ColorModeProvider } from '../react/provider/theme';
 import { JupyterContext } from '../react/provider/jupyter';
 import { ServiceManager } from '@jupyterlab/services';
+import { requestAPI } from '../handler';
 
 export class DeAIPanel extends ReactWidget {
   /**
@@ -19,8 +20,21 @@ export class DeAIPanel extends ReactWidget {
     super();
     this.addClass('jp-deai-panel');
     this._store = storeFactory();
-    this.options.context.ready.then(() => {
+    this.options.context.ready.then(async () => {
       const state = this.options.context.model.toJSON() as any;
+      const protocol = state['protocol'];
+      const response = await requestAPI<{
+        action: 'CREATE_SESSION';
+        payload: { sessionId: string; availableImages: string[] };
+      }>('', {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'CREATE_SESSION',
+          payload: protocol
+        })
+      });
+      state['sessionId'] = response.payload.sessionId;
+      state['availableImages'] = response.payload.availableImages;
       this._store.dispatch(reduxAction.load(state));
     });
   }

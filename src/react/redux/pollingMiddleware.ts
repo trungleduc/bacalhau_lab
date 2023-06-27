@@ -19,6 +19,8 @@ export function pollingMiddlewareFactory(): Middleware {
 
     if (startPolling && jobId) {
       intervalId = setInterval(async () => {
+        console.log('getting response');
+
         const response = await getLog(jobId);
         if (response.action === 'NEW_LOG') {
           store.dispatch(reduxAction.logInfo(response.payload));
@@ -26,7 +28,7 @@ export function pollingMiddlewareFactory(): Middleware {
           clearInterval(intervalId);
           store.dispatch(reduxAction.stopPolling());
         }
-      }, 1000);
+      }, 500);
     } else {
       store.dispatch(reduxAction.stopPolling());
       clearInterval(intervalId);

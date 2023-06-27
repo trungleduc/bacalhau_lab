@@ -40,6 +40,40 @@ class RouteHandler(APIHandler):
             else:
                 self.finish(json.dumps({"action": "END_LOG"}))
 
+        if action == "CREATE_SESSION":
+            session_id = self.job_manager.create_session(payload)
+            session = self.job_manager.get_session(session_id)
+            get_docker_images = getattr(session, "get_docker_images", None)
+            available_images = []
+
+            if get_docker_images is not None:
+                available_images = get_docker_images()
+            self.finish(
+                json.dumps(
+                    {
+                        "action": "CREATE_SESSION",
+                        "payload": {
+                            "sessionId": session_id,
+                            "availableImages": available_images,
+                        },
+                    }
+                )
+            )
+
+        if action == "CUSTOM_IMAGE":
+            success, msg = self.job_manager.add_image_to_session(
+                payload["sessionId"], payload["customDockerImage"]
+            )
+
+            self.finish(
+                json.dumps(
+                    {
+                        "action": "CUSTOM_IMAGE",
+                        "payload": {"success": success, "msg": msg},
+                    }
+                )
+            )
+
 
 def setup_handlers(web_app):
     host_pattern = ".*$"

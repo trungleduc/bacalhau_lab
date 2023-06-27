@@ -118,8 +118,7 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
             });
             const newContent: IDeAIState = {
               protocol: protocol,
-              availableImage:
-                serverData.availableProtocol[protocol].availableImages,
+              availableImages: [],
               resources: {},
               notebook: nbContent
             };

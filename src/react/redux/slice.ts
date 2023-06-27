@@ -3,7 +3,7 @@ import { IDeAIResource, IDeAIState } from './types';
 
 export const INITIAL_STATE: IDeAIState = {
   protocol: undefined,
-  availableImage: [],
+  availableImages: [],
   dockerImage: undefined,
   customDockerImage: undefined,
   resources: {},
@@ -26,6 +26,14 @@ export const slice = createSlice({
       action: PayloadAction<string | undefined>
     ) => {
       return { ...state, customDockerImage: action.payload };
+    },
+    addCustomDockerImage: (state, action: PayloadAction<string>) => {
+      return {
+        ...state,
+        availableImages: [...state.availableImages, action.payload],
+        dockerImage: action.payload,
+        customDockerImage: ''
+      };
     },
     addResource: (state, action: PayloadAction<string>) => {
       const id = action.payload;

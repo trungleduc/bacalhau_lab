@@ -7,9 +7,10 @@ export interface IDeAIResource {
 }
 export interface IDeAIState {
   protocol?: string;
+  sessionId?: string;
   dockerImage?: string;
   customDockerImage?: string;
-  availableImage: string[];
+  availableImages: string[];
   resources: IDict<IDeAIResource>;
   notebook?: IDict;
   log?: { level: 'info' | 'error'; content: string; timestamp: number }[];

@@ -33,12 +33,16 @@ class RouteHandler(APIHandler):
             self.finish(
                 json.dumps({"action": "EXECUTING", "payload": {"jobId": job_id}})
             )
-        if action == "GET_LOG":
-            log = self.job_manager.get_log(payload)
-            if log is not None:
-                self.finish(json.dumps({"action": "NEW_LOG", "payload": log}))
-            else:
-                self.finish(json.dumps({"action": "END_LOG"}))
+        if action == "GET_STATE":
+            session_id = payload["payload"]
+            job_id = payload["jobId"]
+            state, log = self.job_manager.get_log(session_id, job_id)
+
+            self.finish(
+                json.dumps(
+                    {"action": "GET_STATE", "payload": {"state": state, "log": log}}
+                )
+            )
 
         if action == "CREATE_SESSION":
             session_id = self.job_manager.create_session(payload)

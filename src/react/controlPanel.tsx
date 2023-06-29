@@ -97,7 +97,7 @@ export function ControlPanel() {
     });
 
     const { action, payload } = response;
-
+    const sessionId = docContent['sessionId'];
     switch (action) {
       case 'RESOURCE_ERROR': {
         const newError: IDict = {};
@@ -113,7 +113,9 @@ export function ControlPanel() {
       case 'EXECUTING': {
         const { jobId } = payload;
         dispatch(reduxAction.logInfo(`Executing job with id ${jobId}`));
-        dispatch(reduxAction.togglePolling({ startPolling: true, jobId }));
+        dispatch(
+          reduxAction.togglePolling({ startPolling: true, sessionId, jobId })
+        );
         break;
       }
       case 'EXECUTION_ERROR':

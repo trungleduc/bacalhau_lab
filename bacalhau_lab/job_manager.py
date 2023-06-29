@@ -1,3 +1,6 @@
+import json
+import os
+import tempfile
 from typing import Dict, Optional, Tuple
 from deairequest import BacalhauProtocol, DeProtocol
 from deairequest.DeProtocolSelector import DeProtocolSelector
@@ -9,6 +12,7 @@ class JobManager:
     def __init__(self) -> None:
         self._connector_session: Dict[str, BacalhauProtocol] = {}
         self._log_stream: Dict[str, Response] = {}
+        self._notebooks = {}
 
     def create_session(self, protocol_name: str) -> str:
         session_id = str(uuid4())
@@ -39,18 +43,71 @@ class JobManager:
         connector = self._connector_session.get(session_id)
         if connector is None:
             return
-        job_id = connector.submit_job("foo", data)
-        self._connector_session[job_id] = connector
-        self._log_stream[job_id] = connector.get_logs(job_id).iter_lines()
+        # Save notebook to a temp file
+        notebook = data.get("notebook", None)
+        if notebook is None:
+            return
+        nb_handler, nb_path = tempfile.mkstemp(prefix=session_id, suffix=".ipynb")
+        with os.fdopen(nb_handler, "w") as f:
+            json.dump(notebook, f)
+
+        # Set docker image
+        docker_image = data.get("dockerImage", None)
+        if docker_image is None:
+            return
+        connector.set_docker_image(docker_image)
+
+        # Set resources
+        resources = data.get("resources", {})
+        for resource in resources.values():
+            res_type = resource["type"]
+            res_value = resource["value"]
+            encrypted = res_type["encryption"]
+            data_type = None
+            if res_type == "file":
+                if os.path.isfile(res_value):
+                    data_type = connector.get_file_data_type()
+                else:
+                    data_type = connector.get_directory_data_type()
+            elif res_type == "url":
+                data_type = connector.get_url_data_type()
+            elif res_type == "ipfs":
+                data_type = connector.get_ipfs_data_type()
+            if data_type is not None:
+                connector.add_dataset(
+                    type=data_type,
+                    value=res_value,
+                    encrypted=encrypted,
+                )
+        job_id = connector.submit_job(nb_path)
+
+        self._notebooks[job_id] = nb_path
+        self._log_stream[job_id] = connector.get_logs(job_id).iter_content(
+            chunk_size=1024
+        )
         return job_id
         # self._connectorSession[id] =
 
-    def get_log(self, job_id: str) -> Optional[str]:
+    def clean_up(self, job_id: str):
+        nb_path = self._notebooks.pop(job_id, None)
+        if nb_path and os.path.exists(nb_path):
+            os.remove(nb_path)
+
+        self._log_stream.pop(job_id, None)
+
+    def remove_session(self, session_id):
+        self._connector_session.pop(session_id, None)
+
+    def get_log(self, session_id: str, job_id: str) -> Optional[str]:
+        connector = self._connector_session.get(session_id)
         log_stream = self._log_stream.get(job_id, None)
-        if log_stream is None:
-            return None
+        if connector is None or log_stream is None:
+            return None, None
+        state = connector.get_state(job_id)
+        log = None
         try:
             log_line = next(log_stream)
-            return log_line.decode("utf-8")
+            log = log_line.decode("utf-8")
         except StopIteration:
-            return None
+            pass
+        return state, log

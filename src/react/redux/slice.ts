@@ -102,7 +102,11 @@ export const slice = createSlice({
     },
     togglePolling: (
       state,
-      action: PayloadAction<{ startPolling: boolean; jobId?: string }>
+      action: PayloadAction<{
+        startPolling: boolean;
+        sessionId?: string;
+        jobId?: string;
+      }>
     ) => ({
       ...state,
       polling: action.payload.startPolling

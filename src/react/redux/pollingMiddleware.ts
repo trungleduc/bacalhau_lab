@@ -10,18 +10,18 @@ export function pollingMiddlewareFactory(): Middleware {
     if (!reduxAction.togglePolling.match(action)) {
       return next(action);
     }
-    const { startPolling, jobId } = action.payload;
+    const { startPolling, sessionId, jobId } = action.payload;
 
     const currentState: IDeAIState = store.getState();
     if (currentState.polling === startPolling) {
       next(action);
     }
 
-    if (startPolling && jobId) {
+    if (startPolling && sessionId && jobId) {
       intervalId = setInterval(async () => {
         console.log('getting response');
 
-        const response = await getLog(jobId);
+        const response = await getLog(sessionId, jobId);
         if (response.action === 'NEW_LOG') {
           store.dispatch(reduxAction.logInfo(response.payload));
         } else if (response.action === 'END_LOG') {

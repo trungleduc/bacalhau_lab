@@ -86,7 +86,6 @@ class JobManager:
             chunk_size=1024
         )
         return job_id
-        # self._connectorSession[id] =
 
     def clean_up(self, job_id: str):
         nb_path = self._notebooks.pop(job_id, None)

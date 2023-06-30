@@ -33,8 +33,18 @@ class RouteHandler(APIHandler):
             self.finish(
                 json.dumps({"action": "EXECUTING", "payload": {"jobId": job_id}})
             )
+            return
+        if action == "CLEAN_JOB":
+            job_id = payload["jobId"]
+            try:
+                self.job_manager.clean_up(job_id)
+                self.finish(json.dumps({"action": "CLEAN_JOB", "payload": 1}))
+            except Exception as e:
+                self.finish(json.dumps({"action": "CLEAN_JOB", "payload": str(e)}))
+            return
+
         if action == "GET_STATE":
-            session_id = payload["payload"]
+            session_id = payload["sessionId"]
             job_id = payload["jobId"]
             state, log = self.job_manager.get_log(session_id, job_id)
 
@@ -43,7 +53,7 @@ class RouteHandler(APIHandler):
                     {"action": "GET_STATE", "payload": {"state": state, "log": log}}
                 )
             )
-
+            return
         if action == "CREATE_SESSION":
             session_id = self.job_manager.create_session(payload)
             session = self.job_manager.get_session(session_id)
@@ -63,7 +73,7 @@ class RouteHandler(APIHandler):
                     }
                 )
             )
-
+            return
         if action == "CUSTOM_IMAGE":
             success, msg = self.job_manager.add_image_to_session(
                 payload["sessionId"], payload["customDockerImage"]
@@ -77,6 +87,7 @@ class RouteHandler(APIHandler):
                     }
                 )
             )
+            return
 
 
 def setup_handlers(web_app):

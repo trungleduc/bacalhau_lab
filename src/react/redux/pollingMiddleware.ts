@@ -1,6 +1,6 @@
 import { Middleware } from 'redux';
 import { reduxAction } from './slice';
-import { IDeAIState } from './types';
+import { IDeAIState, ILogContent } from './types';
 import { cleanJob, getLog } from '../tools';
 
 export function pollingMiddlewareFactory(): Middleware {
@@ -19,16 +19,18 @@ export function pollingMiddlewareFactory(): Middleware {
 
     if (startPolling && sessionId && jobId) {
       intervalId = setInterval(async () => {
-        console.log('Polling');
-
+        
         const response = await getLog(sessionId, jobId);
         if (response.action === 'GET_STATE') {
           const { state, log } = response.payload;
+ 
+          const logObject: {events: ILogContent[]} = log
           if (state !== 'Completed') {
-            store.dispatch(reduxAction.logInfo(log));
+            store.dispatch(reduxAction.logExecution(logObject.events));
           } else {
             clearInterval(intervalId);
             store.dispatch(reduxAction.stopPolling());
+            store.dispatch(reduxAction.logExecution(logObject.events));
             store.dispatch(reduxAction.logInfo(`Job ${jobId} finished`));
             const cleanRes = await cleanJob(jobId);
             if (cleanRes.payload !== 1) {
@@ -40,7 +42,7 @@ export function pollingMiddlewareFactory(): Middleware {
             }
           }
         }
-      }, 500);
+      }, 1000);
     } else {
       store.dispatch(reduxAction.stopPolling());
       clearInterval(intervalId);

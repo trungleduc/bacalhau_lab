@@ -4,14 +4,13 @@ import tempfile
 from typing import Dict, Optional, Tuple
 from deairequest import BacalhauProtocol, DeProtocol
 from deairequest.DeProtocolSelector import DeProtocolSelector
-from requests import Response
+import json
 from uuid import uuid4
 
 
 class JobManager:
     def __init__(self) -> None:
         self._connector_session: Dict[str, BacalhauProtocol] = {}
-        self._log_stream: Dict[str, Response] = {}
         self._notebooks = {}
 
     def create_session(self, protocol_name: str) -> str:
@@ -82,9 +81,6 @@ class JobManager:
         job_id = connector.submit_job(nb_path)
 
         self._notebooks[job_id] = nb_path
-        self._log_stream[job_id] = connector.get_logs(job_id).iter_content(
-            chunk_size=1024
-        )
         return job_id
 
     def clean_up(self, job_id: str):
@@ -92,21 +88,15 @@ class JobManager:
         if nb_path and os.path.exists(nb_path):
             os.remove(nb_path)
 
-        self._log_stream.pop(job_id, None)
 
     def remove_session(self, session_id):
         self._connector_session.pop(session_id, None)
 
     def get_log(self, session_id: str, job_id: str) -> Optional[str]:
         connector = self._connector_session.get(session_id)
-        log_stream = self._log_stream.get(job_id, None)
-        if connector is None or log_stream is None:
+        if connector is None:
             return None, None
+        log_str = connector.get_logs(job_id)
         state = connector.get_state(job_id)
-        log = None
-        try:
-            log_line = next(log_stream)
-            log = log_line.decode("utf-8")
-        except StopIteration:
-            pass
+        log = log_str.to_dict()
         return state, log

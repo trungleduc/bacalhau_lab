@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { IDeAIResource, IDeAIState } from './types';
+import { IDeAIResource, IDeAIState, ILogContent } from './types';
 
 export const INITIAL_STATE: IDeAIState = {
   protocol: undefined,
@@ -99,6 +99,40 @@ export const slice = createSlice({
           { level: 'info', content: action.payload, timestamp }
         ]
       };
+    },
+    logExecution: (state, action: PayloadAction<ILogContent[]>) => {
+      const currentLog = state.log ?? [];
+      const currentDate = new Date();
+      const timestamp = currentDate.getTime();
+      if(action.payload.length > currentLog.length){
+        const content = [...currentLog]
+        for (let idx = currentLog.length; idx < action.payload.length; idx++) {
+          const element = action.payload[idx];
+          let logLine = ''
+          switch (element.type) {
+            case 'JobLevel':
+              logLine = `${element.type} - ${element.job_state.new}`
+              break;
+            case 'ExecutionLevel':
+              logLine = `${element.type} - ${element.execution_state.new}`
+              break
+            default:
+              break;
+          }
+          content.push({
+            level:'info',
+            content: logLine,
+            timestamp
+          })
+        }
+
+        return {
+          ...state,
+          log: content
+        };
+      } else {
+        return {...state}
+      }
     },
     togglePolling: (
       state,

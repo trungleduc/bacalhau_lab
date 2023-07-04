@@ -13,12 +13,13 @@ import {
 } from '@jupyterlab/notebook';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { CommandRegistry } from '@lumino/commands';
-import { ReadonlyPartialJSONObject } from '@lumino/coreutils';
+import { ReadonlyPartialJSONObject, UUID } from '@lumino/coreutils';
 import { IDisposable } from '@lumino/disposable';
 
 import { DeAISwitcher } from './widget';
 import { IDeAIProtocol, IDict } from '../token';
-import { IDeAIState } from '../react/redux/types';
+import { IDeAIResource, IDeAIState } from '../react/redux/types';
+import { requestAPI } from '../handler';
 
 /**
  * The command IDs used by the plugin.
@@ -94,6 +95,18 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
           const ext = args['ext'] as string;
           const path = PathExt.dirname(nbFullPath);
           let newPath = PathExt.join(path, `${fileName}.${ext}.deai`);
+          const parsedResources = await requestAPI<IDeAIResource[]>('', {
+            method: 'POST',
+            body: JSON.stringify({
+              action: 'PARSE_RESOURCES',
+              payload: { nbContent }
+            })
+          })
+          console.log('res', parsedResources);
+          const resources: IDict<IDeAIResource> = {}
+          parsedResources.forEach(item =>{
+            resources[UUID.uuid4()] = item
+          })
           try {
             const newFile = await app.serviceManager.contents.get(newPath);
 
@@ -104,6 +117,7 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
             fileContent['availableImage'] =
               serverData.availableProtocol[protocol].availableImages;
             fileContent['notebook'] = nbContent;
+            fileContent['resources'] = resources;
             const content = JSON.stringify(fileContent);
 
             await app.serviceManager.contents.save(newPath, {
@@ -119,7 +133,7 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
             const newContent: IDeAIState = {
               protocol: protocol,
               availableImages: [],
-              resources: {},
+              resources,
               notebook: nbContent
             };
             await app.serviceManager.contents.save(newUntitled.path, {

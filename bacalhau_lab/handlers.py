@@ -22,6 +22,14 @@ class RouteHandler(APIHandler):
         body = self.get_json_body()
         action = body.get("action")
         payload = body.get("payload")
+        if action == 'PARSE_RESOURCES':
+            notebook = payload["nbContent"]
+            print(notebook) # Parse the resources from notebook content
+            resources = [{'type':'file', 'value':'foobar', 'encryption': True}]
+            self.finish(
+                json.dumps(resources)
+            )
+            return
         if action == "EXECUTE":
             check_response = check_data(payload)
             if len(check_response) > 0:

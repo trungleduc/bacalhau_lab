@@ -1,8 +1,9 @@
 import { requestAPI } from '../handler';
+import { ILogContent } from './redux/types';
 
 interface ILogResponse {
   action: 'GET_STATE';
-  payload: { state: string; log: string };
+  payload: { state: string; log: {events: ILogContent[]} };
 }
 export async function getLog(
   sessionId: string,

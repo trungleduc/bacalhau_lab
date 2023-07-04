@@ -21,7 +21,7 @@ export function LogPanel() {
         <div className="jp-LogConsoleListPlaceholder">No log messages.</div>
       )}
       {log &&
-        log.map((logLine, idx) => (
+        log.map((logLine, idx: number) => (
           <Box key={idx} sx={{ display: 'flex' }}>
             <div
               className="lm-Widget jp-OutputArea-prompt jp-deai-logTimestamp"

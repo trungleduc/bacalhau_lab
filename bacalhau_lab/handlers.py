@@ -109,7 +109,6 @@ class RouteHandler(APIHandler):
                 if os.path.exists('my_folder'):
                     shutil.rmtree(dest,ignore_errors=True)
                 os.makedirs(dest)
-                print('session_id', session_id,'job_id', job_id, 'current', dest)
                 session = self.job_manager.get_session(session_id)
                 if session is None:
                     return

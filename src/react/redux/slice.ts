@@ -7,7 +7,8 @@ export const INITIAL_STATE: IDeAIState = {
   dockerImage: undefined,
   customDockerImage: undefined,
   resources: {},
-  polling: false
+  polling: false,
+  resultAvailable: false
 };
 
 export const slice = createSlice({
@@ -104,26 +105,26 @@ export const slice = createSlice({
       const currentLog = state.log ?? [];
       const currentDate = new Date();
       const timestamp = currentDate.getTime();
-      if(action.payload.length > currentLog.length){
-        const content = [...currentLog]
+      if (action.payload.length > currentLog.length) {
+        const content = [...currentLog];
         for (let idx = currentLog.length; idx < action.payload.length; idx++) {
           const element = action.payload[idx];
-          let logLine = ''
+          let logLine = '';
           switch (element.type) {
             case 'JobLevel':
-              logLine = `${element.type} - ${element.job_state.new}`
+              logLine = `${element.type} - ${element.job_state.new}`;
               break;
             case 'ExecutionLevel':
-              logLine = `${element.type} - ${element.execution_state.new}`
-              break
+              logLine = `${element.type} - ${element.execution_state.new}`;
+              break;
             default:
               break;
           }
           content.push({
-            level:'info',
+            level: 'info',
             content: logLine,
             timestamp
-          })
+          });
         }
 
         return {
@@ -131,7 +132,7 @@ export const slice = createSlice({
           log: content
         };
       } else {
-        return {...state}
+        return { ...state };
       }
     },
     togglePolling: (
@@ -148,7 +149,13 @@ export const slice = createSlice({
     stopPolling: state => ({
       ...state,
       polling: false
-    })
+    }),
+    updateResultStatus: (state, action: PayloadAction<boolean>) => {
+      return { ...state, resultAvailable: action.payload };
+    },
+    updateJobId: (state, action: PayloadAction<string | undefined>) => {
+      return { ...state, jobId: action.payload };
+    }
   }
 });
 

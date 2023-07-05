@@ -1,4 +1,6 @@
 import json
+import os
+import shutil
 import tornado
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.utils import url_path_join
@@ -24,10 +26,10 @@ class RouteHandler(APIHandler):
         payload = body.get("payload")
         if action == 'PARSE_RESOURCES':
             notebook = payload["nbContent"]
-            print(notebook) # Parse the resources from notebook content
+            print('##########', notebook) # Parse the resources from notebook content
             resources = [{'type':'file', 'value':'foobar', 'encryption': True}]
             self.finish(
-                json.dumps(resources)
+                json.dumps({"resources":resources, "cwd": os.getcwd()})
             )
             return
         if action == "EXECUTE":
@@ -97,6 +99,31 @@ class RouteHandler(APIHandler):
             )
             return
 
+        if action == "DOWNLOAD_RESULT":
+            session_id = payload.get("sessionId")
+            job_id = payload.get("jobId")
+            current_dir = payload.get("currentDir")
+            deai_file_name = payload.get("deaiFileName")
+            if session_id is not None and job_id is not None and current_dir is not None and deai_file_name is not None: 
+                dest = os.path.join(current_dir, deai_file_name)
+                if os.path.exists('my_folder'):
+                    shutil.rmtree(dest,ignore_errors=True)
+                os.makedirs(dest)
+                print('session_id', session_id,'job_id', job_id, 'current', dest)
+                session = self.job_manager.get_session(session_id)
+                if session is None:
+                    return
+                session.get_results(job_id, dest)
+                self.finish(
+                    json.dumps(
+                        {
+                            "action": "DOWNLOAD_RESULT",
+                            "payload": {"success": True, "msg": "Results downloaded successfully"},
+                        }
+                    )
+                )
+            
+            return
 
 def setup_handlers(web_app):
     host_pattern = ".*$"

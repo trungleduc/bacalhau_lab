@@ -94,19 +94,23 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
           const protocol = args['protocol'] as string;
           const ext = args['ext'] as string;
           const path = PathExt.dirname(nbFullPath);
-          let newPath = PathExt.join(path, `${fileName}.${ext}.deai`);
-          const parsedResources = await requestAPI<IDeAIResource[]>('', {
+          const deaiFileName = `${fileName}.${ext}`;
+          let newPath = PathExt.join(path, `${deaiFileName}.deai`);
+
+          const response = await requestAPI<{
+            resources: IDeAIResource[];
+            cwd: string;
+          }>('', {
             method: 'POST',
             body: JSON.stringify({
               action: 'PARSE_RESOURCES',
               payload: { nbContent }
             })
-          })
-          console.log('res', parsedResources);
-          const resources: IDict<IDeAIResource> = {}
-          parsedResources.forEach(item =>{
-            resources[UUID.uuid4()] = item
-          })
+          });
+          const resources: IDict<IDeAIResource> = {};
+          response.resources.forEach(item => {
+            resources[UUID.uuid4()] = item;
+          });
           try {
             const newFile = await app.serviceManager.contents.get(newPath);
 
@@ -118,6 +122,8 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
               serverData.availableProtocol[protocol].availableImages;
             fileContent['notebook'] = nbContent;
             fileContent['resources'] = resources;
+            fileContent['cwd'] = PathExt.join(response.cwd, path);
+            fileContent['deaiFileName'] = deaiFileName;
             const content = JSON.stringify(fileContent);
 
             await app.serviceManager.contents.save(newPath, {
@@ -134,7 +140,9 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
               protocol: protocol,
               availableImages: [],
               resources,
-              notebook: nbContent
+              notebook: nbContent,
+              cwd: PathExt.join(response.cwd, path),
+              deaiFileName
             };
             await app.serviceManager.contents.save(newUntitled.path, {
               ...newUntitled,

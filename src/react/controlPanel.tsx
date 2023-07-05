@@ -14,7 +14,6 @@ import { useAppDispatch, useAppSelector } from './redux/hooks';
 import { requestAPI } from '../handler';
 import { IDict } from '../token';
 import { reduxAction } from './redux/slice';
-import { ILogContent } from './redux/types';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 export function ControlPanel() {
   const jupyterContext = useJupyter();
@@ -28,6 +27,11 @@ export function ControlPanel() {
   } | null>(null);
   const dispatch = useAppDispatch();
   const polling = useAppSelector(state => state.polling);
+  const sessionId = useAppSelector(state => state.sessionId);
+  const jobId = useAppSelector(state => state.jobId);
+  const deaiFileName = useAppSelector(state => state.deaiFileName);
+  const currentDir = useAppSelector(state => state.cwd);
+  const resultAvailable = useAppSelector(state => state.resultAvailable);
   React.useEffect(
     () => () => {
       dispatch(reduxAction.togglePolling({ startPolling: false }));
@@ -93,7 +97,9 @@ export function ControlPanel() {
       content: JSON.stringify(contentWithoutLog, null, 2)
     });
     dispatch(reduxAction.logInfo(`Submitting job ${path}`));
+    dispatch(reduxAction.updateJobId(undefined));
     setExecuting(true);
+
     const response = await requestAPI<{
       action: 'RESOURCE_ERROR' | 'EXECUTING' | 'EXECUTED' | 'EXECUTION_ERROR';
       payload: IDict;
@@ -135,223 +141,25 @@ export function ControlPanel() {
     }
   }, [jupyterContext, docContent, dockerImage, customDockerImage, dispatch]);
   const getResult = React.useCallback(async () => {
-    const log = {
-      events: [
-        {
-          comment: 'Job created',
-          compute_reference: 'None',
-          execution_state: 'None',
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: { new: 'None', previous: 'None' },
-          new_version: 1,
-          node_id: 'None',
-          time: '2023-07-02T21:26:34.549307149Z',
-          type: 'JobLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'None',
-          execution_state: 'None',
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: { new: 'Queued', previous: 'None' },
-          new_version: 2,
-          node_id: 'None',
-          time: '2023-07-02T21:26:34.549313463Z',
-          type: 'JobLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'None',
-          execution_state: 'None',
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: { new: 'None', previous: 'Queued' },
-          new_version: 3,
-          node_id: 'None',
-          time: '2023-07-02T21:26:34.693673117Z',
-          type: 'JobLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'None',
-          execution_state: 'None',
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: { new: 'InProgress', previous: 'None' },
-          new_version: 4,
-          node_id: 'None',
-          time: '2023-07-02T21:26:34.69441838Z',
-          type: 'JobLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'e-2786f4d5-15a0-45c6-b1a1-ae4f0fee1db4',
-          execution_state: {
-            new: 'AskForBidAccepted',
-            previous: 'AskForBid'
-          },
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: 'None',
-          new_version: 2,
-          node_id: 'QmUDAXvv31WPZ8U9CzuRTMn9iFGiopGE7rHiah1X8a6PkT',
-          time: '2023-07-02T21:26:34.699931349Z',
-          type: 'ExecutionLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'e-2786f4d5-15a0-45c6-b1a1-ae4f0fee1db4',
-          execution_state: { new: 'AskForBid', previous: 'None' },
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: 'None',
-          new_version: 1,
-          node_id: 'QmUDAXvv31WPZ8U9CzuRTMn9iFGiopGE7rHiah1X8a6PkT',
-          time: '2023-07-02T21:26:34.699931349Z',
-          type: 'ExecutionLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'e-857e04f4-a618-4c91-b5dc-7db5ff2fbb42',
-          execution_state: { new: 'AskForBid', previous: 'None' },
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: 'None',
-          new_version: 1,
-          node_id: 'QmYgxZiySj3MRkwLSL4X2MF5F9f2PMhAE3LV49XkfNL1o3',
-          time: '2023-07-02T21:26:34.699957842Z',
-          type: 'ExecutionLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'e-857e04f4-a618-4c91-b5dc-7db5ff2fbb42',
-          execution_state: {
-            new: 'AskForBidAccepted',
-            previous: 'AskForBid'
-          },
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: 'None',
-          new_version: 2,
-          node_id: 'QmYgxZiySj3MRkwLSL4X2MF5F9f2PMhAE3LV49XkfNL1o3',
-          time: '2023-07-02T21:26:34.699957842Z',
-          type: 'ExecutionLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'e-5885718a-f53e-4070-8b4c-b601c5a8bc02',
-          execution_state: { new: 'AskForBid', previous: 'None' },
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: 'None',
-          new_version: 1,
-          node_id: 'QmXaXu9N5GNetatsvwnTfQqNtSeKAD6uCmarbh3LMRYAcF',
-          time: '2023-07-02T21:26:34.699968891Z',
-          type: 'ExecutionLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'e-5885718a-f53e-4070-8b4c-b601c5a8bc02',
-          execution_state: {
-            new: 'AskForBidAccepted',
-            previous: 'AskForBid'
-          },
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: 'None',
-          new_version: 2,
-          node_id: 'QmXaXu9N5GNetatsvwnTfQqNtSeKAD6uCmarbh3LMRYAcF',
-          time: '2023-07-02T21:26:34.699968891Z',
-          type: 'ExecutionLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'e-857e04f4-a618-4c91-b5dc-7db5ff2fbb42',
-          execution_state: {
-            new: 'BidAccepted',
-            previous: 'AskForBidAccepted'
-          },
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: 'None',
-          new_version: 3,
-          node_id: 'QmYgxZiySj3MRkwLSL4X2MF5F9f2PMhAE3LV49XkfNL1o3',
-          time: '2023-07-02T21:26:34.789324447Z',
-          type: 'ExecutionLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'e-857e04f4-a618-4c91-b5dc-7db5ff2fbb42',
-          execution_state: {
-            new: 'WaitingVerification',
-            previous: 'BidAccepted'
-          },
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: 'None',
-          new_version: 4,
-          node_id: 'QmYgxZiySj3MRkwLSL4X2MF5F9f2PMhAE3LV49XkfNL1o3',
-          time: '2023-07-02T21:26:34.789558264Z',
-          type: 'ExecutionLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'e-5885718a-f53e-4070-8b4c-b601c5a8bc02',
-          execution_state: {
-            new: 'BidRejected',
-            previous: 'AskForBidAccepted'
-          },
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: 'None',
-          new_version: 3,
-          node_id: 'QmXaXu9N5GNetatsvwnTfQqNtSeKAD6uCmarbh3LMRYAcF',
-          time: '2023-07-02T21:26:35.017846724Z',
-          type: 'ExecutionLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'e-2786f4d5-15a0-45c6-b1a1-ae4f0fee1db4',
-          execution_state: {
-            new: 'BidRejected',
-            previous: 'AskForBidAccepted'
-          },
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: 'None',
-          new_version: 3,
-          node_id: 'QmUDAXvv31WPZ8U9CzuRTMn9iFGiopGE7rHiah1X8a6PkT',
-          time: '2023-07-02T21:26:36.353084342Z',
-          type: 'ExecutionLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'e-857e04f4-a618-4c91-b5dc-7db5ff2fbb42',
-          execution_state: {
-            new: 'ResultAccepted',
-            previous: 'WaitingVerification'
-          },
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: 'None',
-          new_version: 5,
-          node_id: 'QmYgxZiySj3MRkwLSL4X2MF5F9f2PMhAE3LV49XkfNL1o3',
-          time: '2023-07-02T21:26:37.349325381Z',
-          type: 'ExecutionLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'e-857e04f4-a618-4c91-b5dc-7db5ff2fbb42',
-          execution_state: { new: 'Completed', previous: 'ResultAccepted' },
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: 'None',
-          new_version: 6,
-          node_id: 'QmYgxZiySj3MRkwLSL4X2MF5F9f2PMhAE3LV49XkfNL1o3',
-          time: '2023-07-02T21:26:37.349400968Z',
-          type: 'ExecutionLevel'
-        },
-        {
-          comment: 'None',
-          compute_reference: 'None',
-          execution_state: 'None',
-          job_id: 'b57d8847-76fb-4a64-a107-b5435b1f78e6',
-          job_state: { new: 'Completed', previous: 'InProgress' },
-          new_version: 5,
-          node_id: 'None',
-          time: '2023-07-02T21:26:37.355106091Z',
-          type: 'JobLevel'
-        }
-      ]
-    };
-    dispatch(reduxAction.logExecution(log.events as ILogContent[]));
-  }, [dispatch]);
+    if (!resultAvailable) {
+      return;
+    }
+    const res = await requestAPI<{
+      action: 'DOWNLOAD_RESULT';
+      payload: { success: boolean; msg: string };
+    }>('', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'DOWNLOAD_RESULT',
+        payload: { sessionId, jobId, currentDir, deaiFileName }
+      })
+    });
+    if (res.payload.success) {
+      dispatch(reduxAction.logInfo(res.payload.msg));
+    } else {
+      dispatch(reduxAction.logError(res.payload.msg));
+    }
+  }, [dispatch, resultAvailable, jobId, currentDir, sessionId, deaiFileName]);
   return (
     <Box className="jp-deai-control-panel">
       <AppBar position="static" sx={{ marginBottom: '20px' }}>
@@ -396,10 +204,10 @@ export function ControlPanel() {
             }
           />
           <BottomNavigationAction
-            // color="disabled"
-            // disabled
+            color={resultAvailable ? 'primary' : 'disabled'}
+            disabled={!resultAvailable}
             label="GET RESULT"
-            icon={<Download color="disabled" />}
+            icon={<Download color={resultAvailable ? 'primary' : 'disabled'} />}
             onClick={getResult}
           />
         </BottomNavigation>

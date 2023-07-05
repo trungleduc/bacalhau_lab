@@ -19,12 +19,11 @@ export function pollingMiddlewareFactory(): Middleware {
 
     if (startPolling && sessionId && jobId) {
       intervalId = setInterval(async () => {
-        
         const response = await getLog(sessionId, jobId);
         if (response.action === 'GET_STATE') {
           const { state, log } = response.payload;
- 
-          const logObject: {events: ILogContent[]} = log
+
+          const logObject: { events: ILogContent[] } = log;
           if (state !== 'Completed') {
             store.dispatch(reduxAction.logExecution(logObject.events));
           } else {
@@ -40,6 +39,8 @@ export function pollingMiddlewareFactory(): Middleware {
                 )
               );
             }
+            store.dispatch(reduxAction.updateResultStatus(true));
+            store.dispatch(reduxAction.updateJobId(jobId));
           }
         }
       }, 1000);

@@ -24,13 +24,11 @@ class RouteHandler(APIHandler):
         body = self.get_json_body()
         action = body.get("action")
         payload = body.get("payload")
-        if action == 'PARSE_RESOURCES':
+        if action == "PARSE_RESOURCES":
             notebook = payload["nbContent"]
-            print('##########', notebook) # Parse the resources from notebook content
+            print("##########", notebook)  # Parse the resources from notebook content
             resources = []
-            self.finish(
-                json.dumps({"resources":resources, "cwd": os.getcwd()})
-            )
+            self.finish(json.dumps({"resources": resources, "cwd": os.getcwd()}))
             return
         if action == "EXECUTE":
             check_response = check_data(payload)
@@ -104,10 +102,15 @@ class RouteHandler(APIHandler):
             job_id = payload.get("jobId")
             current_dir = payload.get("currentDir")
             deai_file_name = payload.get("deaiFileName")
-            if session_id is not None and job_id is not None and current_dir is not None and deai_file_name is not None: 
+            if (
+                session_id is not None
+                and job_id is not None
+                and current_dir is not None
+                and deai_file_name is not None
+            ):
                 dest = os.path.join(current_dir, deai_file_name)
-                if os.path.exists('my_folder'):
-                    shutil.rmtree(dest,ignore_errors=True)
+                if os.path.exists("my_folder"):
+                    shutil.rmtree(dest, ignore_errors=True)
                 os.makedirs(dest)
                 session = self.job_manager.get_session(session_id)
                 if session is None:
@@ -117,12 +120,16 @@ class RouteHandler(APIHandler):
                     json.dumps(
                         {
                             "action": "DOWNLOAD_RESULT",
-                            "payload": {"success": True, "msg": "Results downloaded successfully"},
+                            "payload": {
+                                "success": True,
+                                "msg": "Results downloaded successfully",
+                            },
                         }
                     )
                 )
-            
+
             return
+
 
 def setup_handlers(web_app):
     host_pattern = ".*$"

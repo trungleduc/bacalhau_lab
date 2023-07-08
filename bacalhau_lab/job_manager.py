@@ -88,7 +88,6 @@ class JobManager:
         if nb_path and os.path.exists(nb_path):
             os.remove(nb_path)
 
-
     def remove_session(self, session_id):
         self._connector_session.pop(session_id, None)
 

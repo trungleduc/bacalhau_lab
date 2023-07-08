@@ -27,7 +27,7 @@ class RouteHandler(APIHandler):
         if action == 'PARSE_RESOURCES':
             notebook = payload["nbContent"]
             print('##########', notebook) # Parse the resources from notebook content
-            resources = [{'type':'file', 'value':'foobar', 'encryption': True}]
+            resources = []
             self.finish(
                 json.dumps({"resources":resources, "cwd": os.getcwd()})
             )

@@ -31,7 +31,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install -U "jupyterlab>=4.0.0,<5"
-        python -m pip install 'git+https://github.com/profitgrowinginnovator/DeAIRequest.git@main#subdirectory=DeAIRequest_0011ai/deairequest'
+        python -m pip install deairequest
 
     - name: Lint the extension
       run: |
@@ -97,7 +97,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install -U "jupyterlab>=4.0.0,<5"
-        python -m pip install 'git+https://github.com/profitgrowinginnovator/DeAIRequest.git@main#subdirectory=DeAIRequest_0011ai/deairequest'
+        python -m pip install deairequest
 
     - uses: actions/download-artifact@v3
       with:
@@ -148,7 +148,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install -U "jupyterlab>=4.0.0,<5"
-        python -m pip install 'git+https://github.com/profitgrowinginnovator/DeAIRequest.git@main#subdirectory=DeAIRequest_0011ai/deairequest'
+        python -m pip install deairequest
 
     - name: Download extension package
       uses: actions/download-artifact@v3

@@ -4,7 +4,6 @@ import tempfile
 from typing import Dict, Optional, Tuple
 from deairequest import BacalhauProtocol, DeProtocol
 from deairequest.DeProtocolSelector import DeProtocolSelector
-import json
 from uuid import uuid4
 
 

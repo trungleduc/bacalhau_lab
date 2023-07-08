@@ -18,7 +18,7 @@ export interface IDeAIState {
   polling?: boolean;
   resultAvailable?: boolean;
   cwd?: string;
-  deaiFileName?: string
+  deaiFileName?: string;
 }
 
 export interface IJobLevelLog {

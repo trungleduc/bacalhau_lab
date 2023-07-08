@@ -12,5 +12,5 @@ module.exports = {
     reuseExistingServer: !process.env.CI
   },
   testDir: './tests',
-  snapshotPathTemplate: '{testDir}/{testFileName}-snapshots/{arg}{ext}',
+  snapshotPathTemplate: '{testDir}/{testFileName}-snapshots/{arg}{ext}'
 };

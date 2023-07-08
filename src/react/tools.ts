@@ -3,7 +3,7 @@ import { ILogContent } from './redux/types';
 
 interface ILogResponse {
   action: 'GET_STATE';
-  payload: { state: string; log: {events: ILogContent[]} };
+  payload: { state: string; log: { events: ILogContent[] } };
 }
 export async function getLog(
   sessionId: string,

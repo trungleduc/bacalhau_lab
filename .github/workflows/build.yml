@@ -48,7 +48,8 @@ jobs:
       run: |
         set -eux
         python -m pip install .[test]
-
+        mkdir ~/.bacalhau
+        ssh-keygen -P "" -t rsa -b 4096 -m pem -f ~/.bacalhau/user_id.pem
         pytest -vv -r ap --cov bacalhau_lab
         jupyter server extension list
         jupyter server extension list 2>&1 | grep -ie "bacalhau_lab.*OK"
@@ -180,6 +181,8 @@ jobs:
     - name: Execute integration tests
       working-directory: ui-tests
       run: |
+        mkdir ~/.bacalhau
+        ssh-keygen -P "" -t rsa -b 4096 -m pem -f ~/.bacalhau/user_id.pem
         jlpm playwright test
 
     - name: Upload Playwright Test report

@@ -100,11 +100,68 @@ test.describe('UI Test', () => {
       maxDiffPixelRatio: 0.01
     });
     await page.getByRole('option', { name: 'python:3' }).click();
-    await listbox.waitFor({ state: 'hidden', timeout: 100 });
+    await listbox.waitFor({ state: 'hidden', timeout: 1000 });
     await page.waitForTimeout(500);
     await expect(await page.screenshot()).toMatchSnapshot({
       name: 'deai-bhl-selected-python3.png',
       maxDiffPixelRatio: 0.01
+    });
+  });
+  test('should show the available docker images in error protocol', async ({
+    page
+  }) => {
+    await openInProtocol(page, 'Error');
+
+    const dockerImages = await page.getByRole('button', {
+      name: 'Select docker image'
+    });
+    await dockerImages.click();
+    const listbox = await page.getByRole('listbox', {
+      name: 'Select docker image'
+    });
+    await listbox.waitFor({ state: 'visible' });
+    await expect(await listbox.screenshot()).toMatchSnapshot({
+      name: 'deai-error-docker-images.png',
+      maxDiffPixelRatio: 0.01
+    });
+  });
+  test('should show the custom docker image input', async ({ page }) => {
+    await openInProtocol(page, 'Bacalhau');
+
+    const dockerImages = await page.getByRole('button', {
+      name: 'Select docker image'
+    });
+    await dockerImages.click();
+    const listbox = await page.getByRole('listbox', {
+      name: 'Select docker image'
+    });
+    await listbox.waitFor({ state: 'visible' });
+
+    await page.getByRole('option', { name: 'Custom image' }).click();
+    await listbox.waitFor({ state: 'hidden', timeout: 1000 });
+    await page.waitForTimeout(500);
+    await expect(await page.screenshot()).toMatchSnapshot({
+      name: 'deai-bhl-selected-custom.png',
+      maxDiffPixelRatio: 0.01
+    });
+    const dockerInput = await page.getByPlaceholder('Docker image name');
+    dockerInput.fill('python:3.9.17-slim');
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
+    const logEl = page.locator('div.jp-LogConsolePanel');
+    await page.waitForTimeout(500);
+    const firstLog = await page.getByText('Adding python:3.9.17-slim image');
+    await firstLog.waitFor({ state: 'visible' });
+    await expect(await logEl.screenshot()).toMatchSnapshot({
+      name: 'deai-start-adding-image.png',
+      maxDiffPixelRatio: 0.05
+    });
+    const secondLog = await page.getByText(
+      'Image python:3.9.17-slim added successfully'
+    );
+    await secondLog.waitFor({ state: 'visible', timeout: 360000 });
+    await expect(await logEl.screenshot()).toMatchSnapshot({
+      name: 'deai-end-adding-image.png',
+      maxDiffPixelRatio: 0.05
     });
   });
 });

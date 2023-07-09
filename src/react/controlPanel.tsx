@@ -15,6 +15,7 @@ import { requestAPI } from '../handler';
 import { IDict } from '../token';
 import { reduxAction } from './redux/slice';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
+
 export function ControlPanel() {
   const jupyterContext = useJupyter();
   const docContent = useAppSelector(state => state);

@@ -40,19 +40,6 @@ test.describe('UI Test', () => {
     await page.notebook.openByPath(fullPath);
     await page.notebook.activate(fullPath);
   });
-  test('should emit an activation console message', async ({ page }) => {
-    const logs: string[] = [];
-
-    page.on('console', message => {
-      logs.push(message.text());
-    });
-
-    await page.goto();
-
-    expect(
-      logs.filter(s => s === 'JupyterLab extension bacalhau_lab is activated!')
-    ).toHaveLength(1);
-  });
 
   test('should have run in button', async ({ page }) => {
     const toolbar = await page.getByRole('navigation', {

@@ -1,10 +1,29 @@
-import { expect, test, galata } from '@jupyterlab/galata';
+import {
+  expect,
+  test,
+  galata,
+  IJupyterLabPageFixture
+} from '@jupyterlab/galata';
 import path from 'path';
 /**
  * Don't load JupyterLab webpage before running the tests.
  * This is required to ensure we capture all log messages.
  */
 test.use({ autoGoto: false });
+
+async function openInProtocol(
+  page: IJupyterLabPageFixture,
+  protocol: 'Bacalhau' | 'Error'
+): Promise<void> {
+  await page
+    .getByRole('combobox', {
+      name: 'DeAI Selector'
+    })
+    .click();
+  await page
+    .getByRole('combobox', { name: 'DeAI Selector' })
+    .selectOption(protocol);
+}
 test.describe('UI Test', () => {
   test.beforeEach(async ({ page, request }) => {
     page.setViewportSize({ width: 1920, height: 1080 });
@@ -55,14 +74,7 @@ test.describe('UI Test', () => {
     });
   });
   test('should show the DeAI with bhl protocol', async ({ page }) => {
-    await page
-      .getByRole('combobox', {
-        name: 'DeAI Selector'
-      })
-      .click();
-    await page
-      .getByRole('combobox', { name: 'DeAI Selector' })
-      .selectOption('Bacalhau');
+    await openInProtocol(page, 'Bacalhau');
     const deaiFile = await page
       .getByRole('region', { name: 'side panel content' })
       .getByText('test-bhl.bhl.deai');
@@ -73,20 +85,38 @@ test.describe('UI Test', () => {
     });
   });
   test('should show the DeAI with error protocol', async ({ page }) => {
-    await page
-      .getByRole('combobox', {
-        name: 'DeAI Selector'
-      })
-      .click();
-    await await page
-      .getByRole('combobox', { name: 'DeAI Selector' })
-      .selectOption('Error');
+    await openInProtocol(page, 'Error');
     const deaiFile = await page
       .getByRole('region', { name: 'side panel content' })
       .getByText('test-bhl.err.deai');
     await expect(deaiFile).toHaveCount(1);
     await expect(await page.screenshot()).toMatchSnapshot({
       name: 'deai-error-interface.png',
+      maxDiffPixelRatio: 0.01
+    });
+  });
+  test('should show the available docker images in bhl protocol', async ({
+    page
+  }) => {
+    await openInProtocol(page, 'Bacalhau');
+
+    const dockerImages = await page.getByRole('button', {
+      name: 'Select docker image'
+    });
+    await dockerImages.click();
+    const listbox = await page.getByRole('listbox', {
+      name: 'Select docker image'
+    });
+    await listbox.waitFor({ state: 'visible' });
+    await expect(await listbox.screenshot()).toMatchSnapshot({
+      name: 'deai-bhl-docker-images.png',
+      maxDiffPixelRatio: 0.01
+    });
+    await page.getByRole('option', { name: 'python:3' }).click();
+    await listbox.waitFor({ state: 'hidden', timeout: 100 });
+    await page.waitForTimeout(500);
+    await expect(await page.screenshot()).toMatchSnapshot({
+      name: 'deai-bhl-selected-python3.png',
       maxDiffPixelRatio: 0.01
     });
   });

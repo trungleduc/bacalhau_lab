@@ -43,7 +43,7 @@
   },
   "cwd": "C:\\Users\\leduc\\work\\bacalhau_lab\\examples",
   "deaiFileName": "test-bhl.bhl",
-  "sessionId": "4997e026-1576-4588-ba3d-a015c138d926",
+  "sessionId": "ba06d93a-ba6d-487c-9918-aa43b4e67e09",
   "dockerImage": "python:3",
   "customDockerImage": ""
 }

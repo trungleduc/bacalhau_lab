@@ -187,6 +187,7 @@ jobs:
     - name: Execute integration tests
       working-directory: ui-tests
       run: |
+        jupyter labextension disable jupyterlab-jupytext
         jlpm playwright test
 
     - name: Upload Playwright Test report

@@ -97,6 +97,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        python -m pip install -r test_requirement.txt
         python -m pip install -U "jupyterlab>=4.0.0,<5"
         python -m pip install deairequest
 

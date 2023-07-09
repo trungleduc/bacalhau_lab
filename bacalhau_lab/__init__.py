@@ -1,4 +1,24 @@
+from typing import Iterable
 from .handlers import setup_handlers
+
+
+def path_ipfshttpclient():
+    from ipfshttpclient import client
+
+    old_assert_version = client.assert_version
+
+    def patched_assert_version(
+        version: str,
+        minimum: str = "0.0.1",
+        maximum: str = "0.100.0",
+        blacklist: Iterable[str] = client.VERSION_BLACKLIST,
+    ) -> None:
+        return old_assert_version(version, "0.0.1", maximum, blacklist)
+
+    client.assert_version = patched_assert_version
+
+
+path_ipfshttpclient()
 
 
 def _jupyter_labextension_paths():

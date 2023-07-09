@@ -36,6 +36,8 @@ jobs:
       - name: Install extension
         run: |
           set -eux
+          mkdir ~/.bacalhau
+          ssh-keygen -P "" -t rsa -b 4096 -m pem -f ~/.bacalhau/user_id.pem
           jlpm
           python -m pip install ".[test]"
 

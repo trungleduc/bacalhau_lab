@@ -150,6 +150,7 @@ export function ControlPanel() {
         });
         dispatch(reduxAction.logError({ msg: 'Resource Error!' }));
         setError(newError);
+        setExecuting(false);
         break;
       }
       case 'EXECUTING': {
@@ -187,7 +188,7 @@ export function ControlPanel() {
     if (res.payload.success) {
       dispatch(reduxAction.logInfo({ msg: res.payload.msg }));
       const poll = new Poll({
-        frequency: { interval: 500 },
+        frequency: { interval: 1000 },
         factory: async () => {
           const status = await checkResultStatus(res.payload.task_id);
           if (status === 'finished') {
@@ -200,6 +201,8 @@ export function ControlPanel() {
             dispatch(
               reduxAction.logError({ msg: 'Failed to download result' })
             );
+          } else if (status === 'pending') {
+            dispatch(reduxAction.logError({ msg: 'Download in progress' }));
           }
         }
       });

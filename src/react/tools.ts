@@ -47,7 +47,5 @@ export async function checkResultStatus(
       payload: { taskId }
     })
   });
-  console.log('received', res.payload.status);
-
   return res.payload.status;
 }

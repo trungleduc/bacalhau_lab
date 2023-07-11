@@ -22,11 +22,13 @@ export interface IDeAIState {
 }
 
 export interface IJobLevelLog {
+  comment: string | null;
   type: 'JobLevel';
   job_state: { new: string; previous: string };
   execution_state: string;
 }
 export interface IExecutionLevelLog {
+  comment: string | null;
   type: 'ExecutionLevel';
   execution_state: { new: string; previous: string };
   job_state: string;

@@ -24,11 +24,12 @@ export function pollingMiddlewareFactory(): Middleware {
 
         if (response.action === 'GET_STATE') {
           const { state, log } = response.payload;
+          console.log('###', state, log);
 
           const logObject: { events: ILogContent[] } = log;
-          if (state !== 'Completed') {
+          if (state !== 'Completed' && state !== 'Error') {
             store.dispatch(reduxAction.logExecution(logObject.events));
-          } else {
+          } else if (state === 'Completed') {
             clearInterval(intervalId);
             store.dispatch(reduxAction.stopPolling());
             store.dispatch(reduxAction.logExecution(logObject.events));
@@ -45,6 +46,21 @@ export function pollingMiddlewareFactory(): Middleware {
             }
             store.dispatch(reduxAction.updateResultStatus(true));
             store.dispatch(reduxAction.updateJobId(jobId));
+          } else if (state === 'Error') {
+            clearInterval(intervalId);
+            store.dispatch(reduxAction.stopPolling());
+            store.dispatch(reduxAction.logExecution(logObject.events));
+            store.dispatch(
+              reduxAction.logError({ msg: `Job ${jobId} failed` })
+            );
+            const cleanRes = await cleanJob(jobId);
+            if (cleanRes.payload !== 1) {
+              store.dispatch(
+                reduxAction.logError({
+                  msg: `Failed to clean job ${jobId}: ${cleanRes.payload}`
+                })
+              );
+            }
           }
         }
       }, 1000);

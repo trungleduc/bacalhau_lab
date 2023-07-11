@@ -126,12 +126,13 @@ export const slice = createSlice({
         for (let idx = currentLog.length; idx < action.payload.length; idx++) {
           const element = action.payload[idx];
           let logLine = '';
+          const comment = element.comment ? ` - ${element.comment}` : '';
           switch (element.type) {
             case 'JobLevel':
-              logLine = `${element.type} - ${element.job_state.new}`;
+              logLine = `${element.type} - ${element.job_state.new}${comment}`;
               break;
             case 'ExecutionLevel':
-              logLine = `${element.type} - ${element.execution_state.new}`;
+              logLine = `${element.type} - ${element.execution_state.new}${comment}`;
               break;
             default:
               break;

@@ -26,7 +26,7 @@ def content_from_path(path: str | Path) -> str:
 def check_site_exist(url) -> bool:
     try:
         url_parts = urlparse(url)
-        request = requests.head("://".join([url_parts.scheme, url_parts.netloc]))
+        request = requests.head(url_parts.geturl())
         return request.status_code == HTTPStatus.OK
     except Exception:
         return False

@@ -48,14 +48,11 @@ def check_data(data: Dict) -> Dict:
         else:
             if value["type"] == "file":
                 exist = os.path.exists(value["value"])
-                response[key] = {"validated": exist, "message": None}
-                if not exist:
-                    response[key]["message"] = MSG
+
             elif value["type"] == "url":
                 exist = check_site_exist(value["value"])
 
-            response[key] = {"validated": exist, "message": None}
             if not exist:
-                response[key]["message"] = MSG
+                response[key] = {"validated": exist, "message": MSG}
 
     return response

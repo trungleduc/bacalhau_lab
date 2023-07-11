@@ -58,11 +58,13 @@ class JobManager:
         connector.set_docker_image(docker_image)
 
         # Set resources
+        connector.remove_datasets()
         resources = data.get("resources", {})
+
         for resource in resources.values():
             res_type = resource["type"]
             res_value = resource["value"]
-            encrypted = res_type["encryption"]
+            encrypted = resource["encryption"]
             data_type = None
             if res_type == "file":
                 if os.path.isfile(res_value):

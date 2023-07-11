@@ -10,16 +10,23 @@ from .deai_handler import check_data, init_data
 
 
 class RouteHandler(APIHandler):
+    """Custom handler for the extension"""
+
     def initialize(self, **kwargs):
+        """Initialize the handler"""
+
         self.job_manager: JobManager = kwargs.pop("job_manager")
         super().initialize(**kwargs)
 
     @tornado.web.authenticated
     def get(self):
+        """Return the initialized data to the GET request."""
         self.finish(json.dumps({"payload": init_data()}))
 
     @tornado.web.authenticated
     async def post(self):
+        """Handler for the POST request"""
+
         body = self.get_json_body()
         action = body.get("action")
         payload = body.get("payload")
@@ -149,6 +156,7 @@ class RouteHandler(APIHandler):
 
 
 def setup_handlers(web_app):
+    """Add custom handler to the Jupyter web app"""
     host_pattern = ".*$"
 
     base_url = web_app.settings["base_url"]

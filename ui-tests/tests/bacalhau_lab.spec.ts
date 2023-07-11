@@ -139,11 +139,15 @@ test.describe('UI Test', () => {
   });
   test('should show missing docker image error', async ({ page }) => {
     await openInProtocol(page, 'Bacalhau');
-    await page.getByRole('button', { name: 'RUN' }).click();
+    await page.waitForTimeout(500);
+    const run = page.getByRole('button', { name: 'RUN' });
+    await run.waitFor({ state: 'visible' });
+    await run.click();
+    await page.waitForTimeout(500);
     const root = await page.locator('.MuiContainer-root');
     await expect(await root.screenshot()).toMatchSnapshot({
       name: 'deai-missing-docker-image.png',
-      maxDiffPixelRatio: 0.05
+      maxDiffPixelRatio: 0.01
     });
   });
   test('should add the resource', async ({ page }) => {

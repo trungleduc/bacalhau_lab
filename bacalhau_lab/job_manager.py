@@ -10,11 +10,20 @@ from uuid import uuid4
 
 class JobManager:
     def __init__(self) -> None:
+        """Class to manage the connectors"""
         self._connector_session: Dict[str, BacalhauProtocol] = {}
         self._notebooks = {}
         self._get_result_task = {}
 
     def create_session(self, protocol_name: str) -> str:
+        """Create a connector session with the requested protocol
+
+        Args:
+            protocol_name (str): The connector protocol
+
+        Returns:
+            str: id of created session.
+        """
         session_id = str(uuid4())
         if protocol_name is None:
             return None
@@ -24,11 +33,28 @@ class JobManager:
         return session_id
 
     def get_session(self, session_id: str) -> Optional[DeProtocol]:
+        """Get the connector session from its id
+
+        Args:
+            session_id (str): _description_
+
+        Returns:
+            Optional[DeProtocol]: _description_
+        """
         return self._connector_session.get(session_id)
 
     def add_image_to_session(
         self, session_id: str, image_name: str
     ) -> Tuple[bool, str]:
+        """Add custom docker image to a connector session
+
+        Args:
+            session_id (str): Id of the session
+            image_name (str): Name of docker image
+
+        Returns:
+            Tuple[bool, str]: Operation result and error message.
+        """
         session = self._connector_session.get(session_id)
         if session is None:
             return False, "Missing session"
@@ -39,6 +65,14 @@ class JobManager:
             return False, str(e)
 
     def execute(self, data: Dict) -> Optional[str]:
+        """Execute session with input data
+
+        Args:
+            data (Dict): Execution data
+
+        Returns:
+            Optional[str]: Job Id
+        """
         session_id = data.get("sessionId")
         connector = self._connector_session.get(session_id)
         if connector is None:
@@ -87,14 +121,33 @@ class JobManager:
         return job_id
 
     def clean_up(self, job_id: str):
+        """Remove the notebook created by the execution
+
+        Args:
+            job_id (str): Id of the connector session
+        """
         nb_path = self._notebooks.pop(job_id, None)
         if nb_path and os.path.exists(nb_path):
             os.remove(nb_path)
 
     def remove_session(self, session_id):
+        """Remove a connector session
+
+        Args:
+            session_id (_type_): Id of the connector session
+        """
         self._connector_session.pop(session_id, None)
 
-    def get_log(self, session_id: str, job_id: str) -> Optional[str]:
+    def get_log(self, session_id: str, job_id: str) -> Tuple[str, str]:
+        """Get execution log of a job in a session
+
+        Args:
+            session_id (str): Id of the connector session
+            job_id (str): Id of the job
+
+        Returns:
+            Optional[str]: Return the state and log of the job
+        """
         connector = self._connector_session.get(session_id)
         if connector is None:
             return None, None
@@ -104,9 +157,27 @@ class JobManager:
         return state, log
 
     def get_download_status(self, task_id: str) -> str:
+        """Get download status
+
+        Args:
+            task_id (str): Id of the download task
+
+        Returns:
+            str: Status of the process
+        """
         return self._get_result_task.get(task_id, "error")
 
     def get_result(self, session_id: str, job_id: str, dest: str) -> Dict:
+        """Get the result of the executed job
+
+        Args:
+            session_id (str): Id of the connector session
+            job_id (str): Id of the job
+            dest (str): Path to save the result data.
+
+        Returns:
+            Dict: Task id and log message.
+        """
         if not os.path.exists(dest):
             os.makedirs(dest)
         session = self.get_session(session_id)

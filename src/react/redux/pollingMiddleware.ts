@@ -18,7 +18,7 @@ export function pollingMiddlewareFactory(): Middleware {
       next(action);
     }
 
-    if (startPolling && sessionId && jobId) {
+    if (startPolling && sessionId && jobId && !intervalId) {
       intervalId = setInterval(async () => {
         const response = await getLog(sessionId, jobId);
 
@@ -29,6 +29,8 @@ export function pollingMiddlewareFactory(): Middleware {
             store.dispatch(reduxAction.logExecution(logObject.events));
           } else if (state === 'Completed') {
             clearInterval(intervalId);
+            intervalId = null;
+
             store.dispatch(reduxAction.stopPolling());
             store.dispatch(reduxAction.logExecution(logObject.events));
             store.dispatch(
@@ -46,6 +48,7 @@ export function pollingMiddlewareFactory(): Middleware {
             store.dispatch(reduxAction.updateJobId(jobId));
           } else if (state === 'Error') {
             clearInterval(intervalId);
+            intervalId = null;
             store.dispatch(reduxAction.stopPolling());
             store.dispatch(reduxAction.logExecution(logObject.events));
             store.dispatch(
@@ -65,6 +68,7 @@ export function pollingMiddlewareFactory(): Middleware {
     } else {
       store.dispatch(reduxAction.stopPolling());
       clearInterval(intervalId);
+      intervalId = null;
     }
 
     return next(action);

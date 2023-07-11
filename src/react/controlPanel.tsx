@@ -77,6 +77,9 @@ export function ControlPanel() {
   }, [jupyterContext, docContent]);
 
   const execute = React.useCallback(async () => {
+    if (executing) {
+      return;
+    }
     if (!dockerImage || dockerImage.length === 0) {
       setDockerError({ el: 'dockerSelector', msg: 'Missing image' });
       return;
@@ -202,7 +205,7 @@ export function ControlPanel() {
               reduxAction.logError({ msg: 'Failed to download result' })
             );
           } else if (status === 'pending') {
-            dispatch(reduxAction.logError({ msg: 'Download in progress' }));
+            dispatch(reduxAction.logInfo({ msg: 'Download in progress' }));
           }
         }
       });

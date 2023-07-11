@@ -31,8 +31,7 @@ class RouteHandler(APIHandler):
         action = body.get("action")
         payload = body.get("payload")
         if action == "PARSE_RESOURCES":
-            payload["nbContent"]
-            # Parse the resources from notebook content
+            # Parse the resources from notebook content in payload["nbContent"]
             resources = []
             server_root_dir = os.path.abspath(self.settings["serverapp"].root_dir)
             cwd = os.path.join(server_root_dir, payload["currentPath"])

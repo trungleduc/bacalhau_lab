@@ -15,6 +15,10 @@ import { requestAPI } from '../handler';
 import { IDict } from '../token';
 import { reduxAction } from './redux/slice';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
+import { Contents } from '@jupyterlab/services';
+import { Dialog, showDialog } from '@jupyterlab/apputils';
+import { Poll } from '@lumino/polling';
+import { checkResultStatus } from './tools';
 
 export function ControlPanel() {
   const jupyterContext = useJupyter();
@@ -91,14 +95,35 @@ export function ControlPanel() {
 
     const path = context.path;
     const currentFile = await serviceManager.contents.get(path);
+    const nbPath = path.replace('.bhl.deai', '.ipynb');
+    let nbContent: Contents.IModel | null = null;
+    try {
+      nbContent = await serviceManager.contents.get(nbPath);
+    } catch (e) {
+      await showDialog({
+        title: 'Missing notebook',
+        body: `The notebook ${nbPath} is missing`,
+        buttons: [Dialog.okButton()]
+      });
+      return;
+    }
+
     const contentWithoutLog = JSON.parse(JSON.stringify(docContent));
     delete contentWithoutLog['log'];
+    if (nbContent) {
+      contentWithoutLog['notebook'] = nbContent.content;
+    }
+
     await serviceManager.contents.save(context.path, {
       ...currentFile,
       content: JSON.stringify(contentWithoutLog, null, 2)
     });
-    dispatch(reduxAction.logInfo(`Submitting job ${path}`));
+
+    dispatch(
+      reduxAction.logInfo({ msg: `Submitting job ${path}`, reset: true })
+    );
     dispatch(reduxAction.updateJobId(undefined));
+    dispatch(reduxAction.updateResultStatus(false));
     setExecuting(true);
 
     const response = await requestAPI<{
@@ -108,12 +133,13 @@ export function ControlPanel() {
       method: 'POST',
       body: JSON.stringify({
         action: 'EXECUTE',
-        payload: docContent
+        payload: contentWithoutLog
       })
     });
 
     const { action, payload } = response;
     const sessionId = docContent['sessionId'];
+
     switch (action) {
       case 'RESOURCE_ERROR': {
         const newError: IDict = {};
@@ -122,13 +148,15 @@ export function ControlPanel() {
             newError[key] = value?.message;
           }
         });
-        dispatch(reduxAction.logError('Resource Error!'));
+        dispatch(reduxAction.logError({ msg: 'Resource Error!' }));
         setError(newError);
         break;
       }
       case 'EXECUTING': {
         const { jobId } = payload;
-        dispatch(reduxAction.logInfo(`Executing job with id ${jobId}`));
+        dispatch(
+          reduxAction.logInfo({ msg: `Executing job with id ${jobId}` })
+        );
         dispatch(
           reduxAction.togglePolling({ startPolling: true, sessionId, jobId })
         );
@@ -147,7 +175,7 @@ export function ControlPanel() {
     }
     const res = await requestAPI<{
       action: 'DOWNLOAD_RESULT';
-      payload: { success: boolean; msg: string };
+      payload: { success: boolean; msg: string; task_id: string };
     }>('', {
       method: 'POST',
       body: JSON.stringify({
@@ -155,12 +183,33 @@ export function ControlPanel() {
         payload: { sessionId, jobId, currentDir, deaiFileName }
       })
     });
+
     if (res.payload.success) {
-      dispatch(reduxAction.logInfo(res.payload.msg));
+      dispatch(reduxAction.logInfo({ msg: res.payload.msg }));
+      const poll = new Poll({
+        frequency: { interval: 500 },
+        factory: async () => {
+          const status = await checkResultStatus(res.payload.task_id);
+          if (status === 'finished') {
+            poll.stop();
+            dispatch(
+              reduxAction.logInfo({ msg: 'Result downloaded successfully' })
+            );
+          } else if (status === 'error') {
+            poll.stop();
+            dispatch(
+              reduxAction.logError({ msg: 'Failed to download result' })
+            );
+          }
+        }
+      });
+      poll.start();
     } else {
-      dispatch(reduxAction.logError(res.payload.msg));
+      dispatch(reduxAction.logError({ msg: res.payload.msg }));
     }
+    dispatch(reduxAction.updateResultStatus(false));
   }, [dispatch, resultAvailable, jobId, currentDir, sessionId, deaiFileName]);
+
   return (
     <Box className="jp-deai-control-panel">
       <AppBar position="static" sx={{ marginBottom: '20px' }}>

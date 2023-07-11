@@ -77,28 +77,44 @@ export const slice = createSlice({
         return { ...state };
       }
     },
-    logError: (state, action: PayloadAction<string>) => {
-      const currentLog = state.log ?? [];
-      const currentDate = new Date();
-      const timestamp = currentDate.getTime();
+    cleanLog: state => {
       return {
         ...state,
-        log: [
-          ...currentLog,
-          { level: 'error', content: action.payload, timestamp }
-        ]
+        log: []
       };
     },
-    logInfo: (state, action: PayloadAction<string>) => {
+    logError: (
+      state,
+      action: PayloadAction<{ msg: string; reset?: boolean }>
+    ) => {
       const currentLog = state.log ?? [];
       const currentDate = new Date();
       const timestamp = currentDate.getTime();
       return {
         ...state,
-        log: [
-          ...currentLog,
-          { level: 'info', content: action.payload, timestamp }
-        ]
+        log: action.payload.reset
+          ? [{ level: 'error', content: action.payload.msg, timestamp }]
+          : [
+              ...currentLog,
+              { level: 'error', content: action.payload.msg, timestamp }
+            ]
+      };
+    },
+    logInfo: (
+      state,
+      action: PayloadAction<{ msg: string; reset?: boolean }>
+    ) => {
+      const currentLog = state.log ?? [];
+      const currentDate = new Date();
+      const timestamp = currentDate.getTime();
+      return {
+        ...state,
+        log: action.payload.reset
+          ? [{ level: 'info', content: action.payload.msg, timestamp }]
+          : [
+              ...currentLog,
+              { level: 'info', content: action.payload.msg, timestamp }
+            ]
       };
     },
     logExecution: (state, action: PayloadAction<ILogContent[]>) => {

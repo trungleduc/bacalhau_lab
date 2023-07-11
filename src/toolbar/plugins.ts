@@ -71,7 +71,6 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
 
       return widget;
     }
-
     function isEnabled(): boolean {
       return (
         notebooks?.currentWidget !== null &&
@@ -104,7 +103,7 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
             method: 'POST',
             body: JSON.stringify({
               action: 'PARSE_RESOURCES',
-              payload: { nbContent }
+              payload: { nbContent, currentPath: path }
             })
           });
           const resources: IDict<IDeAIResource> = {};
@@ -122,7 +121,7 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
               serverData.availableProtocol[protocol].availableImages;
             fileContent['notebook'] = nbContent;
             fileContent['resources'] = resources;
-            fileContent['cwd'] = PathExt.join(response.cwd, path);
+            fileContent['cwd'] = response.cwd;
             fileContent['deaiFileName'] = deaiFileName;
             const content = JSON.stringify(fileContent);
 
@@ -136,12 +135,13 @@ export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
               type: 'file',
               ext: '.deai'
             });
+
             const newContent: IDeAIState = {
               protocol: protocol,
               availableImages: [],
               resources,
               notebook: nbContent,
-              cwd: PathExt.join(response.cwd, path),
+              cwd: response.cwd,
               deaiFileName
             };
             await app.serviceManager.contents.save(newUntitled.path, {

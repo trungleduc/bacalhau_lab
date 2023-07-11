@@ -33,3 +33,21 @@ export async function cleanJob(jobId: string): Promise<ICleanJobResponse> {
   });
   return res;
 }
+
+export async function checkResultStatus(
+  taskId: string
+): Promise<'error' | 'pending' | 'finished'> {
+  const res = await requestAPI<{
+    action: 'CHECK_DOWNLOAD_STATUS';
+    payload: { status: 'error' | 'pending' | 'finished' };
+  }>('', {
+    method: 'POST',
+    body: JSON.stringify({
+      action: 'CHECK_DOWNLOAD_STATUS',
+      payload: { taskId }
+    })
+  });
+  console.log('received', res.payload.status);
+
+  return res.payload.status;
+}

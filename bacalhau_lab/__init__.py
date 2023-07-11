@@ -2,7 +2,7 @@ from typing import Iterable
 from .handlers import setup_handlers
 
 
-def path_ipfshttpclient():
+def patch_ipfshttpclient():
     from ipfshttpclient import client
 
     old_assert_version = client.assert_version
@@ -16,9 +16,6 @@ def path_ipfshttpclient():
         return old_assert_version(version, "0.0.1", maximum, blacklist)
 
     client.assert_version = patched_assert_version
-
-
-path_ipfshttpclient()
 
 
 def _jupyter_labextension_paths():
@@ -37,6 +34,7 @@ def _load_jupyter_server_extension(server_app):
     server_app: jupyterlab.labapp.LabApp
         JupyterLab application instance
     """
+    patch_ipfshttpclient()
     setup_handlers(server_app.web_app)
     name = "bacalhau_lab"
     server_app.log.info(f"Registered {name} server extension")

@@ -1,6 +1,5 @@
 import json
 import os
-import shutil
 import tornado
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.utils import url_path_join
@@ -25,10 +24,11 @@ class RouteHandler(APIHandler):
         action = body.get("action")
         payload = body.get("payload")
         if action == "PARSE_RESOURCES":
-            notebook = payload["nbContent"]
-            print("##########", notebook)  # Parse the resources from notebook content
+            payload["nbContent"]
+            # Parse the resources from notebook content
             resources = []
-            self.finish(json.dumps({"resources": resources, "cwd": os.getcwd()}))
+            cwd = os.path.join(os.getcwd(), payload["currentPath"])
+            self.finish(json.dumps({"resources": resources, "cwd": cwd}))
             return
         if action == "EXECUTE":
             check_response = check_data(payload)
@@ -96,7 +96,15 @@ class RouteHandler(APIHandler):
                 )
             )
             return
-
+        if action == "CHECK_DOWNLOAD_STATUS":
+            task_id = payload.get("taskId")
+            status = self.job_manager.get_download_status(task_id)
+            self.finish(
+                json.dumps(
+                    {"action": "CHECK_DOWNLOAD_STATUS", "payload": {"status": status}}
+                )
+            )
+            return
         if action == "DOWNLOAD_RESULT":
             session_id = payload.get("sessionId")
             job_id = payload.get("jobId")
@@ -109,26 +117,33 @@ class RouteHandler(APIHandler):
                 and deai_file_name is not None
             ):
                 dest = os.path.join(current_dir, deai_file_name)
-                if os.path.exists("my_folder"):
-                    shutil.rmtree(dest, ignore_errors=True)
-                os.makedirs(dest)
-                session = self.job_manager.get_session(session_id)
-                if session is None:
+                response = self.job_manager.get_result(session_id, job_id, dest)
+                if response["task_id"] is None:
+                    self.finish(
+                        json.dumps(
+                            {
+                                "action": "DOWNLOAD_RESULT",
+                                "payload": {
+                                    "success": False,
+                                    "msg": response["msg"],
+                                },
+                            }
+                        )
+                    )
                     return
-                session.get_results(job_id, dest)
                 self.finish(
                     json.dumps(
                         {
                             "action": "DOWNLOAD_RESULT",
                             "payload": {
                                 "success": True,
-                                "msg": "Results downloaded successfully",
+                                "msg": response["msg"],
+                                "task_id": response["task_id"],
                             },
                         }
                     )
                 )
-
-            return
+                return
 
 
 def setup_handlers(web_app):

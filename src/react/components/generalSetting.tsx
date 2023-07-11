@@ -44,7 +44,7 @@ export function GeneralSetting(props: {
     if (!customDockerImage || customDockerImage.length === 0) {
       return;
     }
-    dispatch(reduxAction.logInfo(`Adding ${customDockerImage} image`));
+    dispatch(reduxAction.logInfo({ msg: `Adding ${customDockerImage} image` }));
     const response = await requestAPI<{
       action: 'CUSTOM_IMAGE';
       payload: IDict;
@@ -59,11 +59,15 @@ export function GeneralSetting(props: {
     if (success) {
       dispatch(reduxAction.addCustomDockerImage(customDockerImage));
       dispatch(
-        reduxAction.logInfo(`Image ${customDockerImage} added successfully`)
+        reduxAction.logInfo({
+          msg: `Image ${customDockerImage} added successfully`
+        })
       );
     } else {
       dispatch(
-        reduxAction.logError(`Failed to add Image ${customDockerImage}: ${msg}`)
+        reduxAction.logError({
+          msg: `Failed to add Image ${customDockerImage}: ${msg}`
+        })
       );
     }
   }, [customDockerImage, sessionId, dispatch]);

@@ -1,6 +1,7 @@
 import json
 import os
 import tempfile
+import threading
 from typing import Dict, Optional, Tuple
 from deairequest import BacalhauProtocol, DeProtocol
 from deairequest.DeProtocolSelector import DeProtocolSelector
@@ -11,6 +12,7 @@ class JobManager:
     def __init__(self) -> None:
         self._connector_session: Dict[str, BacalhauProtocol] = {}
         self._notebooks = {}
+        self._get_result_task = {}
 
     def create_session(self, protocol_name: str) -> str:
         session_id = str(uuid4())
@@ -98,3 +100,23 @@ class JobManager:
         state = connector.get_state(job_id)
         log = log_str.to_dict()
         return state, log
+
+    def get_download_status(self, task_id: str) -> str:
+        return self._get_result_task.get(task_id, "error")
+
+    def get_result(self, session_id: str, job_id: str, dest: str) -> Dict:
+        if not os.path.exists(dest):
+            os.makedirs(dest)
+        session = self.get_session(session_id)
+        if session is None:
+            return {"task_id": None, "msg": "Missing session"}
+        task_id = f"get_result::{uuid4()}"
+        self._get_result_task[task_id] = "pending"
+
+        def thread_task():
+            session.get_results(job_id, dest)
+            self._get_result_task[task_id] = "finished"
+
+        x = threading.Thread(target=thread_task)
+        x.start()
+        return {"task_id": task_id, "msg": "Downloading result"}

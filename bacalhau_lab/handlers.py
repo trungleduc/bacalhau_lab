@@ -27,7 +27,9 @@ class RouteHandler(APIHandler):
             payload["nbContent"]
             # Parse the resources from notebook content
             resources = []
-            cwd = os.path.join(os.getcwd(), payload["currentPath"])
+            server_root_dir = os.path.abspath(self.settings["serverapp"].root_dir)
+            cwd = os.path.join(server_root_dir, payload["currentPath"])
+
             self.finish(json.dumps({"resources": resources, "cwd": cwd}))
             return
         if action == "EXECUTE":

@@ -71,17 +71,7 @@ test.describe('UI Test', () => {
       maxDiffPixelRatio: 0.01
     });
   });
-  test('should show the DeAI with error protocol', async ({ page }) => {
-    await openInProtocol(page, 'Error');
-    const deaiFile = await page
-      .getByRole('region', { name: 'side panel content' })
-      .getByText('test-bhl.err.deai');
-    await expect(deaiFile).toHaveCount(1);
-    await expect(await page.screenshot()).toMatchSnapshot({
-      name: 'deai-error-interface.png',
-      maxDiffPixelRatio: 0.01
-    });
-  });
+
   test('should show the available docker images in bhl protocol', async ({
     page
   }) => {
@@ -107,24 +97,7 @@ test.describe('UI Test', () => {
       maxDiffPixelRatio: 0.01
     });
   });
-  test('should show the available docker images in error protocol', async ({
-    page
-  }) => {
-    await openInProtocol(page, 'Error');
 
-    const dockerImages = await page.getByRole('button', {
-      name: 'Select docker image'
-    });
-    await dockerImages.click();
-    const listbox = await page.getByRole('listbox', {
-      name: 'Select docker image'
-    });
-    await listbox.waitFor({ state: 'visible' });
-    await expect(await listbox.screenshot()).toMatchSnapshot({
-      name: 'deai-error-docker-images.png',
-      maxDiffPixelRatio: 0.01
-    });
-  });
   test('should show the custom docker image input', async ({ page }) => {
     await openInProtocol(page, 'Bacalhau');
 
@@ -161,6 +134,110 @@ test.describe('UI Test', () => {
     await secondLog.waitFor({ state: 'visible', timeout: 360000 });
     await expect(await logEl.screenshot()).toMatchSnapshot({
       name: 'deai-end-adding-image.png',
+      maxDiffPixelRatio: 0.05
+    });
+  });
+  test('should show missing docker image error', async ({ page }) => {
+    await openInProtocol(page, 'Bacalhau');
+    await page.getByRole('button', { name: 'RUN' }).click();
+    const root = await page.locator('.MuiContainer-root');
+    await expect(await root.screenshot()).toMatchSnapshot({
+      name: 'deai-missing-docker-image.png',
+      maxDiffPixelRatio: 0.05
+    });
+  });
+  test('should add the resource', async ({ page }) => {
+    await openInProtocol(page, 'Bacalhau');
+    await page.getByRole('button', { name: 'Add resource' }).click();
+    const resourceInput = await page.getByLabel('Path to resource');
+    await resourceInput.waitFor({ state: 'visible' });
+    const root = await page.locator('.MuiContainer-root');
+    await expect(await root.screenshot()).toMatchSnapshot({
+      name: 'deai-add-new-resource.png',
+      maxDiffPixelRatio: 0.05
+    });
+  });
+  test('should remove the resource', async ({ page }) => {
+    await openInProtocol(page, 'Bacalhau');
+    await page.getByRole('button', { name: 'Add resource' }).click();
+    const resourceInput = await page.getByLabel('Path to resource');
+    await resourceInput.waitFor({ state: 'visible' });
+    await page.getByRole('button', { name: 'Remove' }).click();
+    await page.waitForTimeout(500);
+    const root = await page.locator('.MuiContainer-root');
+    await expect(await root.screenshot()).toMatchSnapshot({
+      name: 'deai-remove-old-resource.png',
+      maxDiffPixelRatio: 0.05
+    });
+  });
+  test('should check for the resource', async ({ page }) => {
+    await openInProtocol(page, 'Bacalhau');
+
+    await page.getByRole('button', { name: 'Select docker image' }).click();
+    await page.getByRole('option', { name: 'python:3', exact: true }).click();
+
+    await page.getByRole('button', { name: 'Add resource' }).click();
+    const resourceInput = await page.getByLabel('Path to resource');
+    await resourceInput.waitFor({ state: 'visible' });
+    await page.getByLabel('Path to resource').fill('foobar');
+
+    await page.getByRole('button', { name: 'RUN' }).click();
+    await page.waitForTimeout(500);
+    const root = await page.locator('.MuiContainer-root');
+    await expect(await root.screenshot()).toMatchSnapshot({
+      name: 'deai-resource-error.png',
+      maxDiffPixelRatio: 0.05
+    });
+  });
+  test('should valid the resource', async ({ page }) => {
+    await openInProtocol(page, 'Bacalhau');
+
+    await page.getByRole('button', { name: 'Select docker image' }).click();
+    await page.getByRole('option', { name: 'python:3', exact: true }).click();
+    await page.getByRole('button', { name: 'Add resource' }).click();
+    const resourceInput = await page.getByLabel('Path to resource');
+    await resourceInput.waitFor({ state: 'visible' });
+    await page.getByRole('button', { name: 'File/Directory' }).click();
+    await page.getByRole('option', { name: 'URL' }).click();
+    await page.getByLabel('URL').fill('https://www.google.com/');
+    await page.getByRole('button', { name: 'RUN' }).click();
+    await page.waitForTimeout(500);
+    const root = await page.locator('.MuiContainer-root');
+    await expect(await root.screenshot()).toMatchSnapshot({
+      name: 'deai-resource-valid.png',
+      maxDiffPixelRatio: 0.05
+    });
+  });
+  test('should run the job', async ({ page }) => {
+    await openInProtocol(page, 'Bacalhau');
+
+    await page.getByRole('button', { name: 'Select docker image' }).click();
+    await page.getByRole('option', { name: 'python:3', exact: true }).click();
+
+    await page.getByRole('button', { name: 'RUN' }).click();
+    await page.waitForTimeout(5000);
+
+    await expect(await page.screenshot()).toMatchSnapshot({
+      name: 'deai-submit-job.png',
+      maxDiffPixelRatio: 0.05
+    });
+  });
+  test('should download the result', async ({ page }) => {
+    await openInProtocol(page, 'Bacalhau');
+
+    await page.getByRole('button', { name: 'Select docker image' }).click();
+    await page.getByRole('option', { name: 'python:3', exact: true }).click();
+
+    await page.getByRole('button', { name: 'RUN' }).click();
+    await page.waitForTimeout(5000);
+    await page.getByRole('button', { name: 'GET RESULT' }).click();
+    await page.waitForTimeout(5000);
+    await page
+      .getByRole('button', { name: 'Refresh the file browser.' })
+      .click();
+    await page.waitForTimeout(1000);
+    await expect(await page.screenshot()).toMatchSnapshot({
+      name: 'deai-get-result.png',
       maxDiffPixelRatio: 0.05
     });
   });

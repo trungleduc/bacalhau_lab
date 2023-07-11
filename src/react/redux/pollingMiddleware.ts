@@ -24,8 +24,6 @@ export function pollingMiddlewareFactory(): Middleware {
 
         if (response.action === 'GET_STATE') {
           const { state, log } = response.payload;
-          console.log('###', state, log);
-
           const logObject: { events: ILogContent[] } = log;
           if (state !== 'Completed' && state !== 'Error') {
             store.dispatch(reduxAction.logExecution(logObject.events));

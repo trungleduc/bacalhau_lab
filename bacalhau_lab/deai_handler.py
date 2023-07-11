@@ -8,7 +8,7 @@ from .tools import check_site_exist, content_from_path
 
 class DeProtocolEnum(str, Enum):
     Bacalhau = "Bacalhau"
-    Error = "Error"
+    # Error = "Error"
 
 
 def init_data():

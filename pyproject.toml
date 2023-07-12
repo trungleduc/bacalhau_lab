@@ -39,7 +39,8 @@ test = [
     "pipreqs",
     "jupytext",
     "cerberus",
-    "python-box"
+    "python-box",
+    "pytest-mock"
 ]
 
 [tool.hatch.version]

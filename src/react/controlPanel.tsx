@@ -172,7 +172,14 @@ export function ControlPanel() {
       default:
         break;
     }
-  }, [jupyterContext, docContent, dockerImage, customDockerImage, dispatch]);
+  }, [
+    jupyterContext,
+    docContent,
+    dockerImage,
+    customDockerImage,
+    dispatch,
+    executing
+  ]);
   const getResult = React.useCallback(async () => {
     if (!resultAvailable) {
       return;

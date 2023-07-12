@@ -39,12 +39,12 @@ jobs:
         jlpm
         jlpm run lint:check
 
-    - name: Test the extension
+    - name: Test the frontend extension
       run: |
         set -eux
         jlpm run test
 
-    - name: Build the extension
+    - name: Build and test the backend extension
       run: |
         set -eux
         python -m pip install .[test]

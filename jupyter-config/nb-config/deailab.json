@@ -1,7 +1,7 @@
 {
   "NotebookApp": {
     "nbserver_extensions": {
-      "bacalhau_lab": true
+      "deailab": true
     }
   }
 }

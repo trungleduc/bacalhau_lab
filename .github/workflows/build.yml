@@ -50,12 +50,12 @@ jobs:
         python -m pip install .[test]
         mkdir ~/.bacalhau
         ssh-keygen -P "" -t rsa -b 4096 -m pem -f ~/.bacalhau/user_id.pem
-        pytest -vv -r ap --cov bacalhau_lab
+        pytest -vv -r ap --cov deailab
         jupyter server extension list
-        jupyter server extension list 2>&1 | grep -ie "bacalhau_lab.*OK"
+        jupyter server extension list 2>&1 | grep -ie "deailab.*OK"
 
         jupyter labextension list
-        jupyter labextension list 2>&1 | grep -ie "bacalhau_lab.*OK"
+        jupyter labextension list 2>&1 | grep -ie "deailab.*OK"
         python -m jupyterlab.browser_check
 
     - name: Package the extension
@@ -64,13 +64,13 @@ jobs:
 
         pip install build
         python -m build
-        pip uninstall -y "bacalhau_lab" jupyterlab
+        pip uninstall -y "deailab" jupyterlab
 
     - name: Upload extension packages
       uses: actions/upload-artifact@v3
       with:
         name: extension-artifacts
-        path: dist/bacalhau_lab*
+        path: dist/deailab*
         if-no-files-found: error
 
   test_isolated:
@@ -113,14 +113,14 @@ jobs:
         sudo rm -rf $(which node)
         sudo rm -rf $(which node)
 
-        pip install "jupyterlab>=4.0.0,<5" bacalhau_lab*.whl
+        pip install "jupyterlab>=4.0.0,<5" deailab*.whl
 
 
         jupyter server extension list
-        jupyter server extension list 2>&1 | grep -ie "bacalhau_lab.*OK"
+        jupyter server extension list 2>&1 | grep -ie "deailab.*OK"
 
         jupyter labextension list
-        jupyter labextension list 2>&1 | grep -ie "bacalhau_lab.*OK"
+        jupyter labextension list 2>&1 | grep -ie "deailab.*OK"
         python -m jupyterlab.browser_check --no-browser-test
 
   integration-tests:
@@ -165,7 +165,7 @@ jobs:
     - name: Install the extension
       run: |
         set -eux
-        python -m pip install "jupyterlab>=4.0.0,<5" bacalhau_lab*.whl
+        python -m pip install "jupyterlab>=4.0.0,<5" deailab*.whl
 
     - name: Install dependencies
       working-directory: ui-tests
@@ -209,7 +209,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v3
       with:
-        name: bacalhau_lab-playwright-tests
+        name: deailab-playwright-tests
         path: |
           ui-tests/test-results
           ui-tests/playwright-report

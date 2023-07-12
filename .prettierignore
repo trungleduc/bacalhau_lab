@@ -3,5 +3,5 @@ node_modules
 **/lib
 **/package.json
 !/package.json
-bacalhau_lab
+deailab
 .vscode

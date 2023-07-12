@@ -1,15 +1,15 @@
 {
-  "name": "bacalhau_lab",
+  "name": "deailab",
   "version": "0.1.0",
-  "description": "A JupyterLab extension.",
+  "description": "A JupyterLab extension for DeAI.",
   "keywords": [
     "jupyter",
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "homepage": "https://github.com/trungleduc/bacalhau_lab",
+  "homepage": "https://github.com/trungleduc/deailab",
   "bugs": {
-    "url": "https://github.com/trungleduc/bacalhau_lab/issues"
+    "url": "https://github.com/trungleduc/deailab/issues"
   },
   "license": "BSD-3-Clause",
   "author": {
@@ -25,7 +25,7 @@
   "style": "style/index.css",
   "repository": {
     "type": "git",
-    "url": "https://github.com/trungleduc/bacalhau_lab.git"
+    "url": "https://github.com/trungleduc/deailab.git"
   },
   "scripts": {
     "build": "jlpm build:lib && jlpm build:labextension:dev",
@@ -37,7 +37,7 @@
     "clean": "jlpm clean:lib",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
     "clean:lintcache": "rimraf .eslintcache .stylelintcache",
-    "clean:labextension": "rimraf bacalhau_lab/labextension bacalhau_lab/_version.py",
+    "clean:labextension": "rimraf deailab/labextension deailab/_version.py",
     "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
     "eslint": "jlpm eslint:check --fix",
     "eslint:check": "eslint . --cache --ext .ts,.tsx",
@@ -114,12 +114,12 @@
           "pip"
         ],
         "base": {
-          "name": "bacalhau_lab"
+          "name": "deailab"
         }
       }
     },
     "extension": true,
-    "outputDir": "bacalhau_lab/labextension"
+    "outputDir": "deailab/labextension"
   },
   "eslintIgnore": [
     "node_modules",

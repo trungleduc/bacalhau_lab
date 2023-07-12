@@ -21,7 +21,7 @@ async def test_parse_resources(jp_fetch):
 
 async def test_execute(jp_fetch, mocker):
     execute_mock = mocker.patch(
-        "bacalhau_lab.job_manager.JobManager.execute", return_value="job_id"
+        "deailab.job_manager.JobManager.execute", return_value="job_id"
     )
     body = {"action": "EXECUTE", "payload": {"foo": "bar"}}
     response = await jp_fetch("bacalhau-lab", method="POST", body=json.dumps(body))
@@ -34,7 +34,7 @@ async def test_execute(jp_fetch, mocker):
 
 async def test_execute_resource_error(jp_fetch, mocker):
     execute_mock = mocker.patch(
-        "bacalhau_lab.job_manager.JobManager.execute", return_value="job_id"
+        "deailab.job_manager.JobManager.execute", return_value="job_id"
     )
     body = {
         "action": "EXECUTE",
@@ -50,7 +50,7 @@ async def test_execute_resource_error(jp_fetch, mocker):
 
 
 async def test_clean_job(jp_fetch, mocker):
-    clean_up_mock = mocker.patch("bacalhau_lab.job_manager.JobManager.clean_up")
+    clean_up_mock = mocker.patch("deailab.job_manager.JobManager.clean_up")
     body = {
         "action": "CLEAN_JOB",
         "payload": {"jobId": "jobId"},
@@ -65,7 +65,7 @@ async def test_clean_job(jp_fetch, mocker):
 
 async def test_get_state(jp_fetch, mocker):
     get_state_mock = mocker.patch(
-        "bacalhau_lab.job_manager.JobManager.get_log", return_value=("state", {})
+        "deailab.job_manager.JobManager.get_log", return_value=("state", {})
     )
     body = {
         "action": "GET_STATE",
@@ -81,10 +81,10 @@ async def test_get_state(jp_fetch, mocker):
 
 async def test_create_session(jp_fetch, mocker):
     create_session_mock = mocker.patch(
-        "bacalhau_lab.job_manager.JobManager.create_session", return_value="sessionId"
+        "deailab.job_manager.JobManager.create_session", return_value="sessionId"
     )
     get_session_mock = mocker.patch(
-        "bacalhau_lab.job_manager.JobManager.get_session", return_value={}
+        "deailab.job_manager.JobManager.get_session", return_value={}
     )
     body = {
         "action": "CREATE_SESSION",
@@ -105,7 +105,7 @@ async def test_create_session(jp_fetch, mocker):
 
 async def test_custom_image(jp_fetch, mocker):
     add_image_to_session_mock = mocker.patch(
-        "bacalhau_lab.job_manager.JobManager.add_image_to_session",
+        "deailab.job_manager.JobManager.add_image_to_session",
         return_value=(True, ""),
     )
     body = {
@@ -122,7 +122,7 @@ async def test_custom_image(jp_fetch, mocker):
 
 async def test_check_download_status(jp_fetch, mocker):
     get_download_status_mock = mocker.patch(
-        "bacalhau_lab.job_manager.JobManager.get_download_status",
+        "deailab.job_manager.JobManager.get_download_status",
         return_value="pending",
     )
     body = {
@@ -139,7 +139,7 @@ async def test_check_download_status(jp_fetch, mocker):
 
 async def test_download_result(jp_fetch, mocker):
     get_result_mock = mocker.patch(
-        "bacalhau_lab.job_manager.JobManager.get_result",
+        "deailab.job_manager.JobManager.get_result",
         return_value={"task_id": "taskId", "msg": "foo"},
     )
     body = {
@@ -161,7 +161,7 @@ async def test_download_result(jp_fetch, mocker):
 
 async def test_download_result_error(jp_fetch, mocker):
     get_result_mock = mocker.patch(
-        "bacalhau_lab.job_manager.JobManager.get_result",
+        "deailab.job_manager.JobManager.get_result",
         return_value={"task_id": None, "msg": "error"},
     )
     body = {

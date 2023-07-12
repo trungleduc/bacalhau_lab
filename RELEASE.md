@@ -1,4 +1,4 @@
-# Making a new release of bacalhau_lab
+# Making a new release of deailab
 
 The extension can be published to `PyPI` and `npm` manually or using the [Jupyter Releaser](https://github.com/jupyter-server/jupyter_releaser).
 

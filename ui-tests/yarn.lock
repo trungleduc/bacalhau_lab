@@ -1875,15 +1875,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bacalhau_lab-ui-tests@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "bacalhau_lab-ui-tests@workspace:."
-  dependencies:
-    "@jupyterlab/galata": ^5.0.0
-    "@playwright/test": ^1.32.0
-  languageName: unknown
-  linkType: soft
-
 "balanced-match@npm:^1.0.0":
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
@@ -2254,6 +2245,15 @@ __metadata:
   checksum: 1cfddf86d7bca22f73f2c427f52dfa35c49f50d64e187eb788dcad6e927625c636aa18ae4edd44d084eb9d1f81d8ca4ec305dae7f733c15846a824575b789d73
   languageName: node
   linkType: hard
+
+"deailab-ui-tests@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "deailab-ui-tests@workspace:."
+  dependencies:
+    "@jupyterlab/galata": ^5.0.0
+    "@playwright/test": ^1.32.0
+  languageName: unknown
+  linkType: soft
 
 "debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.3.3":
   version: 4.3.4

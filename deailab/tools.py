@@ -6,13 +6,13 @@ import requests
 
 
 def content_from_path(path: str | Path) -> str:
-    """_summary_
+    """Return the string content from a resource path
 
     Args:
-        path (str | Path): _description_
+        path (str | Path): Path to resource
 
     Returns:
-        str: _description_
+        str: String content
     """
     content = None
     try:

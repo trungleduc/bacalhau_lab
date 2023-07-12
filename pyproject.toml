@@ -3,7 +3,7 @@ requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version"]
 build-backend = "hatchling.build"
 
 [project]
-name = "bacalhau_lab"
+name = "deailab"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
@@ -50,26 +50,26 @@ source = "nodejs"
 fields = ["description", "authors", "urls"]
 
 [tool.hatch.build.targets.sdist]
-artifacts = ["bacalhau_lab/labextension"]
+artifacts = ["deailab/labextension"]
 exclude = [".github", "binder"]
 
 [tool.hatch.build.targets.wheel.shared-data]
-"bacalhau_lab/labextension" = "share/jupyter/labextensions/bacalhau_lab"
-"install.json" = "share/jupyter/labextensions/bacalhau_lab/install.json"
+"deailab/labextension" = "share/jupyter/labextensions/deailab"
+"install.json" = "share/jupyter/labextensions/deailab/install.json"
 "jupyter-config/server-config" = "etc/jupyter/jupyter_server_config.d"
 "jupyter-config/nb-config" = "etc/jupyter/jupyter_notebook_config.d"
 
 [tool.hatch.build.hooks.version]
-path = "bacalhau_lab/_version.py"
+path = "deailab/_version.py"
 
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
 ensured-targets = [
-    "bacalhau_lab/labextension/static/style.js",
-    "bacalhau_lab/labextension/package.json",
+    "deailab/labextension/static/style.js",
+    "deailab/labextension/package.json",
 ]
-skip-if-exists = ["bacalhau_lab/labextension/static/style.js"]
+skip-if-exists = ["deailab/labextension/static/style.js"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 build_cmd = "build:prod"
@@ -79,7 +79,7 @@ npm = ["jlpm"]
 build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
-build_dir = "bacalhau_lab/labextension"
+build_dir = "deailab/labextension"
 
 [tool.jupyter-releaser.options]
 version_cmd = "hatch version"

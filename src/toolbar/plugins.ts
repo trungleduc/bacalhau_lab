@@ -47,7 +47,7 @@ class DeAIButton
 }
 
 export const toolbarPlugin: JupyterFrontEndPlugin<void> = {
-  id: 'bacalhau_lab:toolbar-plugin',
+  id: 'deailab:toolbar-plugin',
   autoStart: true,
   requires: [IDeAIProtocol],
   optional: [

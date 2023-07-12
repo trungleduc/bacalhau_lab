@@ -1,11 +1,11 @@
-# bacalhau_lab
+# deailab
 
-[![Github Actions Status](https://github.com/trungleduc/bacalhau_lab/workflows/Build/badge.svg)](https://github.com/trungleduc/bacalhau_lab/actions/workflows/build.yml)
-A JupyterLab extension.
+[![Github Actions Status](https://github.com/trungleduc/deailab/workflows/Build/badge.svg)](https://github.com/trungleduc/deailab/actions/workflows/build.yml)
+A DeAI JupyterLab extension.
 
-This extension is composed of a Python package named `bacalhau_lab`
-for the server extension and a NPM package named `bacalhau_lab`
-for the frontend extension.
+DeAILab is a JupyterLab extension to interact with the [Decentralized AI Request](https://github.com/profitgrowinginnovator/DeAIRequest) library.
+
+![deailab](deai.png)
 
 ## Requirements
 
@@ -16,7 +16,7 @@ for the frontend extension.
 To install the extension, execute:
 
 ```bash
-pip install bacalhau_lab
+pip install deailab
 ```
 
 ## Uninstall
@@ -24,7 +24,7 @@ pip install bacalhau_lab
 To remove the extension, execute:
 
 ```bash
-pip uninstall bacalhau_lab
+pip uninstall deailab
 ```
 
 ## Troubleshoot
@@ -55,13 +55,13 @@ The `jlpm` command is JupyterLab's pinned version of
 
 ```bash
 # Clone the repo to your local environment
-# Change directory to the bacalhau_lab directory
+# Change directory to the deailab directory
 # Install package in development mode
 pip install -e ".[test]"
 # Link your development version of the extension with JupyterLab
 jupyter labextension develop . --overwrite
 # Server extension must be manually installed in develop mode
-jupyter server extension enable bacalhau_lab
+jupyter server extension enable deailab
 # Rebuild extension Typescript source after making changes
 jlpm build
 ```
@@ -87,13 +87,13 @@ jupyter lab build --minimize=False
 
 ```bash
 # Server extension must be manually disabled in develop mode
-jupyter server extension disable bacalhau_lab
-pip uninstall bacalhau_lab
+jupyter server extension disable deailab
+pip uninstall deailab
 ```
 
 In development mode, you will also need to remove the symlink created by `jupyter labextension develop`
 command. To find its location, you can run `jupyter labextension list` to figure out where the `labextensions`
-folder is located. Then you can remove the symlink named `bacalhau_lab` within that folder.
+folder is located. Then you can remove the symlink named `deailab` within that folder.
 
 ### Testing the extension
 
@@ -112,7 +112,7 @@ jupyter labextension develop . --overwrite
 To execute them, run:
 
 ```sh
-pytest -vv -r ap --cov bacalhau_lab
+pytest -vv -r ap --cov deailab
 ```
 
 #### Frontend tests

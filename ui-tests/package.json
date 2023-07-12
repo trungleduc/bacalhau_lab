@@ -1,7 +1,7 @@
 {
-  "name": "bacalhau_lab-ui-tests",
+  "name": "deailab-ui-tests",
   "version": "1.0.0",
-  "description": "JupyterLab bacalhau_lab Integration Tests",
+  "description": "JupyterLab deailab Integration Tests",
   "private": true,
   "scripts": {
     "start": "jupyter lab --config jupyter_server_test_config.py",
